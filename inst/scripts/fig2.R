@@ -2,6 +2,7 @@
 ### code chunk number 5: compendium
 ###################################################
 library("ff")
+library("Biobase")
 library("genefilter")
 library("IRanges")
 library("MASS")
@@ -10,25 +11,25 @@ library("crlmmCompendium")
 
 
 ###################################################
-### code chunk number 22: loadObject-genotypeSet
+### code chunk number 23: loadObject-genotypeSet
 ###################################################
 if(!exists("genotypeSet")) data(genotypeSet)
 
 
 ###################################################
-### code chunk number 23: dataframeForClusterPlot
+### code chunk number 24: dataframeForClusterPlot
 ###################################################
 df <- prePredictPanel(genotypeSet)
 
 
 ###################################################
-### code chunk number 24: genotypeColor
+### code chunk number 25: genotypeColor
 ###################################################
 fill1 <- brewer.pal(3, "Set1")[df$gt]
 
 
 ###################################################
-### code chunk number 25: confidenceColor
+### code chunk number 26: confidenceColor
 ###################################################
 gt.conf <- df$gt.conf
 min.conf <- min(gt.conf)
@@ -38,21 +39,21 @@ fill2 <- sapply(sc, grey)
 
 
 ###################################################
-### code chunk number 26: scandates
+### code chunk number 27: scandates
 ###################################################
 dt <- strftime(protocolData(genotypeSet)$ScanDate, "%Y-%m-%d", usetz=FALSE)
 range(dt)
 
 
 ###################################################
-### code chunk number 27: dt.batch
+### code chunk number 28: dt.batch
 ###################################################
 dt.batch <- split(dt, batch(genotypeSet))
 sapply(dt.batch, range)
 
 
 ###################################################
-### code chunk number 28: plateColor
+### code chunk number 29: plateColor
 ###################################################
 batch.scale <- which(batch(genotypeSet)=="SCALE")
 batch.sloth <- which(batch(genotypeSet)=="SLOTH")
@@ -63,7 +64,7 @@ fill3[batch.sloth] <- plate.cols[2]
 
 
 ###################################################
-### code chunk number 29: expandDataFrame
+### code chunk number 30: expandDataFrame
 ###################################################
 df2 <- rbind(df, df, df)
 df2$fill <- c(fill1, fill2, fill3)
@@ -72,7 +73,7 @@ df2$colorby <- factor(rep(colorby, each=nrow(df)), levels=colorby, ordered=TRUE)
 
 
 ###################################################
-### code chunk number 30: clusterPlot
+### code chunk number 31: clusterPlot
 ###################################################
 (ABfig <- xyplot(A~B|colorby, df2,
 	      panel=function(x, y, col, fill, plate.cols, ..., subscripts){

@@ -1836,7 +1836,6 @@ save(oligoSetList, file="../../data/oligoSetList.rda")
 @
 
 <<loadOligoSetList, echo=FALSE>>=
-stop()
 load("../../data/oligoSetList.rda")
 @
 
@@ -1852,7 +1851,7 @@ supporting parallel processing, such as the \R{} package
 \Rpackage{snow}, the HMM will automatically be parallelized over
 elements (chromosomes) in the \Robject{oligoSnpSetList} object.
 
-<<hmmForOligoSetList>>=
+<<hmmForOligoSetList,cache=TRUE>>=
 fit2 <- hmm(oligoSetList, sampleIds="NA19007")
 @
 
@@ -1867,11 +1866,11 @@ fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
 		    ylim=c(-4, 1.5),
 		    cex=0.2,
 		    pch=21,
-		    col.het="salmon",
-		    fill.het="salmon",
-		    col.hom="royalblue",
-		    fill.hom="royalblue",
-		    state.cex=0.5,
+		    col.het="red",
+		    fill.het="red",
+		    col.hom="grey",
+		    fill.hom="grey",
+		    state.cex=0.8,
 		    border="orange", scales=list(x="free"),
 		    par.strip.text=list(cex=0.5),
 		    xlab="Mb", ylab=expression(log[2]("R ratio")))

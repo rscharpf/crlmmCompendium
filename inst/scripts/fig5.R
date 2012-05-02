@@ -2,6 +2,7 @@
 ### code chunk number 5: compendium
 ###################################################
 library("ff")
+library("Biobase")
 library("genefilter")
 library("IRanges")
 library("MASS")
@@ -10,38 +11,35 @@ library("crlmmCompendium")
 
 
 ###################################################
-### code chunk number 46: loadObject-redonSet
+### code chunk number 47: loadObject-redonSet
 ###################################################
 if(!exists("redonSet")) data(redonSet)
 
 
 ###################################################
-### code chunk number 44: center
+### code chunk number 45: center
 ###################################################
-copyNumber(redonSet) <- copyNumber(redonSet) - median(copyNumber(redonSet), na.rm=TRUE) + 2
+copyNumber(redonSet) <- copyNumber(redonSet) - median(copyNumber(redonSet), na.rm=TRUE) + 200L
 
 
 ###################################################
-### code chunk number 47: HMM
+### code chunk number 48: HMM
 ###################################################
-hmmOpts <- hmm.setup(redonSet,  c("hom-del", "hem-del", "normal", "amp"),
-		     copynumberStates=c(0:3), normalIndex=3,
-		     log.initialP=rep(log(1/4), 4),
-		     prGenotypeHomozygous=c(0.8, 0.99, 0.7, 0.75))
+cnStates <- c(0, 1, 2, 2, 3, 4)
 
 
 ###################################################
-### code chunk number 48: viterbi
+### code chunk number 49: viterbi
 ###################################################
-fit.cn <- hmm(redonSet, hmmOpts, verbose=FALSE, TAUP=1e10)
+fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE)
 hmm.df <- as.data.frame(fit.cn)
-print(hmm.df[, c(2:4,7:9)])
+print(hmm.df[, c(2:4,7, 10,11)])
 
 
 ###################################################
-### code chunk number 50: dnacopy
+### code chunk number 51: dnacopy
 ###################################################
-CNA.object <- CNA(genomdat=copyNumber(redonSet),
+CNA.object <- CNA(genomdat=copyNumber(redonSet)/100,
 		  chrom=chromosome(redonSet),
 		  maploc=position(redonSet),
 		  data.type="logratio",
@@ -50,14 +48,14 @@ smu.object <- smooth.CNA(CNA.object)
 
 
 ###################################################
-### code chunk number 51: cbs_segment
+### code chunk number 52: cbs_segment
 ###################################################
 cbs.segments <- segment(smu.object)
 print(cbs.segments, showSegRows=TRUE)
 
 
 ###################################################
-### code chunk number 52: coerce2Iranges
+### code chunk number 53: coerce2Iranges
 ###################################################
 cbs.out <- cbs.segments$output
 cbs.segs1 <- RangedData(IRanges(cbs.out$loc.start, cbs.out$loc.end),
@@ -67,7 +65,7 @@ cbs.segs1 <- RangedData(IRanges(cbs.out$loc.start, cbs.out$loc.end),
 
 
 ###################################################
-### code chunk number 53: oligo.data.frame
+### code chunk number 54: oligo.data.frame
 ###################################################
 cbs.segs1 <- addCentromereBreaks(cbs.segs1)
 cn <- as.numeric(copyNumber(redonSet))
@@ -76,10 +74,10 @@ df <- data.frame(cn=cn, gt=gt, position=position(redonSet)/1e6)
 
 
 ###################################################
-### code chunk number 54: redonFigSetup
+### code chunk number 55: redonFigSetup
 ###################################################
 genotype.cols <- c("lightblue", "green3", "lightblue")
-states <- unique(fit.cn$state)
+states <- unique(as.integer(factor(fit.cn$state, levels=c(1, 3, 4, 5))))
 shades <- brewer.pal(10, "PRGn")
 shades <- shades[c(2,4,1,8)]
 shades[3] <- "white"
@@ -90,21 +88,21 @@ mykey$rectangles[["col"]] <- shades[states[order(states)]]
 
 
 ###################################################
-### code chunk number 55: Fig5
+### code chunk number 56: Fig5
 ###################################################
-stdev <- mad(df$cn, na.rm=TRUE)
-redonfig <- xyplot(cn~position, df, pch=".", panel=cnPanel,
-	       ylim=c(-0.5,6), ylab="total copy number",
-	       pch.cols=genotype.cols,
-	       gt=df$gt,
-	       hmm.segs=fit.cn,
-	       cbs.segs=cbs.segs1,
-	       scales=list(x=list(tick.number=12)),
-	       lwd=1,
-	       shades=shades, key=mykey, xlim=c(0,150), draw.key=TRUE,
-	       xlab="physical position (Mb)",
-	       add.ideogram=TRUE,
-	       par.strip.text=list(lines=0.9, cex=0.6))
+stdev <- mad(df$cn, na.rm=TRUE)/100
+redonfig <- xyplot(cn/100~position, df, pch=".", panel=cnPanel,
+		   ylim=c(-0.5,6), ylab="total copy number",
+		   pch.cols=genotype.cols,
+		   gt=df$gt,
+		   hmm.segs=fit.cn,
+		   cbs.segs=cbs.segs1,
+		   scales=list(x=list(tick.number=12)),
+		   lwd=1,
+		   shades=shades, key=mykey, xlim=c(0,150), draw.key=TRUE,
+		   xlab="physical position (Mb)",
+		   add.ideogram=TRUE,
+		   par.strip.text=list(lines=0.9, cex=0.6))
 print(redonfig)
 trellis.focus("panel", 1, 1)
 ltext(median(df$position), 0, "HMM states", cex=0.9)

@@ -2,6 +2,7 @@
 ### code chunk number 5: compendium
 ###################################################
 library("ff")
+library("Biobase")
 library("genefilter")
 library("IRanges")
 library("MASS")
@@ -10,13 +11,13 @@ library("crlmmCompendium")
 
 
 ###################################################
-### code chunk number 36: loadObject-exampleData1
+### code chunk number 37: loadObject-exampleData1
 ###################################################
 if(!exists("exampleData1")) data(exampleData1)
 
 
 ###################################################
-### code chunk number 37: dataCnFigs
+### code chunk number 38: dataCnFigs
 ###################################################
 a <- t(as.matrix(A(exampleData1)))
 gt <- t(as.matrix(calls(exampleData1)))
@@ -38,7 +39,7 @@ boxplotfig <- bwplot(A~gt|snp, ldat, cex=0.6, panel=lmPanel, nu=nuA,
 
 
 ###################################################
-### code chunk number 38: boxplotA
+### code chunk number 39: boxplotA
 ###################################################
 pars <- trellis.par.get()
 pars$axis.text$cex <- 0.7

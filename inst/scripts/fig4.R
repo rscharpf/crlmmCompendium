@@ -2,6 +2,7 @@
 ### code chunk number 5: compendium
 ###################################################
 library("ff")
+library("Biobase")
 library("genefilter")
 library("IRanges")
 library("MASS")
@@ -10,13 +11,13 @@ library("crlmmCompendium")
 
 
 ###################################################
-### code chunk number 36: loadObject-exampleData1
+### code chunk number 37: loadObject-exampleData1
 ###################################################
 if(!exists("exampleData1")) data(exampleData1)
 
 
 ###################################################
-### code chunk number 39: defineLatticeObjects
+### code chunk number 40: defineLatticeObjects
 ###################################################
 ldat <- prePredictPanel(exampleData1)
 shades <- makeTransparent(brewer.pal(6, "BrBG"), alpha=0.6)[c(1,2,3,5,6)]
@@ -32,7 +33,7 @@ mykey$rectangles[["col"]] <- shades
 
 
 ###################################################
-### code chunk number 40: ABscatterplots
+### code chunk number 41: ABscatterplots
 ###################################################
 pars <- trellis.par.get()
 pars$axis.text$cex <- 0.5
