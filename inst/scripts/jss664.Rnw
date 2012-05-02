@@ -1,0 +1,1896 @@
+%% put jss.cls in ~/Library/texmf/tex/latex or in working directory
+\documentclass[article,shortnames]{jss}
+\usepackage{bm}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%% need no \usepackage{Sweave.sty}
+\usepackage{subfig} \usepackage{amsmath,amssymb,setspace}
+\usepackage{multirow} \newcommand{\crlmm}{\pkg{crlmm}}
+\newcommand{\crlmmCompendium}{\pkg{crlmmCompendium}}
+\newcommand{\oligoClasses}{\pkg{oligoClasses}}
+\newcommand{\R}{\proglang{R}} \renewcommand{\S}{\textsf{S}}
+\newcommand{\bioc}{Bioconductor} \newcommand{\CNSet}{\Rclass{CNSet}}
+\newcommand{\eSet}{\Rclass{eSet}} \newcommand{\Biobase}{\pkg{Biobase}}
+\newcommand{\genotype}{\Rfunction{genotype}}
+\newcommand{\crlmmCopynumber}{\Rfunction{crlmmCopynumber}}
+\newcommand{\affyio}{\pkg{affyio}} \newcommand{\snow}{\pkg{snow}}
+\newcommand{\ff}{\pkg{ff}}
+\newcommand{\cacheSweave}{\pkg{cacheSweave}}
+\newcommand{\VanillaICE}{\pkg{VanillaICE}}
+\newcommand{\sva}{\Rpackage{sva}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\lattice}{\Rpackage{lattice}}
+\newcommand{\DNAcopy}{\Rpackage{DNAcopy}}
+\newcommand{\lds}{large data support}
+\newcommand{\Lds}{Large data support}
+\SweaveOpts{eps=FALSE,prefix.string=Figures/manuscript,eps=FALSE,pdf=TRUE}
+%\usepackage{mathabx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\insertFigure}[1]{\begin{center} \vspace{1em} [~~ Figure
+  \label{#1} about here. ~~] \\ \vspace{1em} \end{center}}
+\newcommand{\insertChunk}[1]{\begin{center} \vspace{1em} [~~ Codechunk
+  \ref{#1} about here. ~~] \\ \vspace{1em} \end{center}}
+% use definitions from Biobase.Rnw
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{\pkg{#1}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\A}{\ensuremath{A}}
+\newcommand{\B}{\ensuremath{B}}
+\newcommand{\ldPath}{\Rfunction{ldPath}}
+\newcommand{\ocProbesets}{\Rfunction{ocProbesets}}
+\newcommand{\ocSamples}{\Rfunction{ocSamples}}
+
+
+\def\apriori{\mbox{\emph{a priori}}}
+\def\abinitio{\emph{ab initio}}
+\def\adhoc{\mbox{\emph{ad hoc}}}
+\def\prehoc{\mbox{\emph{pre hoc}}}
+\def\adlibitum{\emph{ad libitum}}
+\def\computo{\mbox{\emph{in computo}}}
+\def\com{\mbox{\emph{in computo}}}
+\def\etal{\mbox{\emph{et al.}}}
+\def\etalia{\mbox{\emph{et alia}}}
+\def\eg{\mbox{\emph{e.\,g.}}}
+\def\ie{\mbox{\emph{i.\,e.}}}
+\def\vivo{\mbox{\emph{in vivo}}}
+\def\vitro{\mbox{\emph{in vitro}}}
+\def\vs{\mbox{\emph{vs.}}}
+\def\versus{\mbox{\emph{versus}}}
+\def\ca{\mbox{\emph{ca.}}}
+\def\defacto{\emph{de facto}}
+\def\dejure{\emph{de jure}}
+\def\denovo{\emph{de novo}}
+\def\via{\emph{via}}
+\def\etc{\mbox{\emph{etc}}}
+\def\etcetera{\mbox{\emph{et cetera}}}
+\def\probono{\mbox{\emph{pro bono}}}
+\def\proforma{\mbox{\emph{pro forma}}}
+\def\per{\mbox{\emph{per}}}
+\def\perse{\mbox{\emph{per se}}}
+\def\perannum{\mbox{\emph{per annum}}}
+\def\pa{\mbox{\emph{p.\,a}}}
+\def\adhoc{\mbox{\emph{ad hoc}}}
+\def\perdiem{\mbox{\emph{per diem}}}
+\def\pd{\mbox{\emph{p.\,d}}}
+\def\situ{\mbox{\emph{in situ}}}
+\def\viceversa{\mbox{\emph{vice versa}}}
+\def\intoto{\mbox{\emph{in toto}}}
+\def\desiderata{\emph{de\-si\-de\-ra\-ta}}
+\def\videinfra{\emph{vide infra}}
+\def\videsupra{\emph{vide supra}}
+\def\viz{\emph{viz.}}
+\def\modulo{\emph{modulo}}
+\def\modusop{\emph{modus operandi}}
+\def\qua{\emph{qua}}
+\def\naive{na\"{\i}ve}
+\def\Naive{Na\"{\i}ve}
+
+\newcommand{\T}{\ensuremath{T}}
+\newcommand{\iA}{\ensuremath{I_{\textnormal{A}}}}
+\newcommand{\iAij}{\ensuremath{I_{\textnormal{A},ij}}}
+%\newcommand{\ibar}{\ensuremath{\overline{I}_{ip}}}
+\newcommand{\ibar}{\ensuremath{\hat{\mu}_{T, i}}}
+\newcommand{\ibarA}{\ensuremath{\overline{I}_{\textnormal{A},i}}}
+%\newcommand{\ibarNA}[1]{\ensuremath{\overline{I}_{#1\textnormal{A},i}}}
+\newcommand{\ibarNA}[1]{\ensuremath{\hat{\mu}_{\textnormal{A},ip}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\muA}[1]{\ensuremath{\hat{\mu}_{\textnormal{A}}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\mA}[1]{\ensuremath{\mu_{\textnormal{A}}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\mB}[1]{\ensuremath{\mu_{\textnormal{B}}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\muB}[1]{\ensuremath{\hat{\mu}_{\textnormal{B}}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\ibarNK}[1]{\ensuremath{\hat{\mu}_{k,ip}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\ibarNB}[1]{\ensuremath{\hat{\mu}_{\textnormal{B},ip}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\ibarNAprime}[1]{\ensuremath{\hat{\mu}_{\textnormal{A},i^\prime p}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\ibarNKprime}[1]{\ensuremath{\hat{\mu}_{k,i^\prime p}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\ibarNBprime}[1]{\ensuremath{\hat{\mu}_{\textnormal{B},i^\prime p}^{\mbox{\tiny
+        #1}}}}
+\newcommand{\bSigma}{\mbox{\boldmath $\Sigma$}}
+\newcommand{\opticalA}{\ensuremath{O_{\textnormal{A}}}}
+\newcommand{\opticalB}{\ensuremath{O_{\textnormal{B}}}}
+\newcommand{\nonspecificA}{\ensuremath{N_{\textnormal{A}}}}
+\newcommand{\nonspeciticB}{\ensuremath{N_{\textnormal{B}}}}
+\newcommand{\specificA}{\ensuremath{S_{\textnormal{A}}}}
+\newcommand{\specificB}{\ensuremath{S_{\textnormal{B}}}}
+\newcommand{\varA}{\ensuremath{\mbox{Var}(\iA{})}}
+\newcommand{\varB}{\ensuremath{\mbox{Var}(\iB{})}}
+\newcommand{\varCA}{\ensuremath{\mbox{Var}(\cA{})}}
+\newcommand{\varCB}{\ensuremath{\mbox{Var}(\cB{})}}
+\newcommand{\sigmaA}{\ensuremath{\sigma_{\textnormal{A}}}}
+\newcommand{\sigmaB}{\ensuremath{\sigma_{\textnormal{B}}}}
+\newcommand{\fA}{\ensuremath{f(\muA)}}
+\newcommand{\fB}{\ensuremath{f(\muB)}}
+\newcommand{\iB}{\ensuremath{I_{\textnormal{B}}}}
+\newcommand{\iBij}{\ensuremath{I_{\textnormal{B},ij}}}
+\newcommand{\ibarB}{\ensuremath{\overline{I}_{\textnormal{B}}}}
+\newcommand{\nuB}{\ensuremath{\nu_{\textnormal{B}}}}
+\newcommand{\nuBi}{\ensuremath{\nu_{\textnormal{B},i}}}
+\newcommand{\deltaB}{\ensuremath{\delta_{\textnormal{B}}}}
+\newcommand{\phiB}{\ensuremath{\phi_{\textnormal{B}}}}
+\newcommand{\phiBprime}{\ensuremath{\phi^\prime_{\textnormal{B}}}}
+\newcommand{\epsilonB}{\ensuremath{\epsilon_{\textnormal{B}}}}
+\newcommand{\tauB}{\ensuremath{\tau_{\textnormal{B}}}}
+\newcommand{\epsilonBprime}{\ensuremath{\epsilon^\prime_{\textnormal{B}}}}
+\newcommand{\cT}{\ensuremath{C_{\textnormal{T}}}}
+\newcommand{\cA}{\ensuremath{C_{\textnormal{A}}}}
+\newcommand{\cB}{\ensuremath{C_{\textnormal{B}}}}
+\newcommand{\cAij}{\ensuremath{C_{\textnormal{A},ij}}}
+\newcommand{\cBij}{\ensuremath{C_{\textnormal{B},ij}}}
+\newcommand{\cAhat}{\ensuremath{\hat{C}_{\textnormal{A},}}}
+\newcommand{\cBhat}{\ensuremath{\hat{C}_{\textnormal{B},}}}
+\newcommand{\w}[1]{\ensuremath{\frac{1}{{\hat \xi_{#1, ip}}}}}
+
+\author{Robert B Scharpf\\Johns Hopkins\\University \And
+        Rafael A Irizarry\\Johns Hopkins\\University \And
+        Matthew E Ritchie \\Walter+Eliza Hall\\ Institute of Medical Research \AND
+        Benilton Carvalho\\University of Cambridge \And
+        Ingo Ruczinski\\Johns Hopkins\\University}
+
+\title{Using the \proglang{R} Package \pkg{crlmm} for Genotyping and Copy Number Estimation}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Robert B Scharpf, Rafael A Irizarry, Matthew E Ritchie, Benilton Carvalho, Ingo Ruczinski} %% comma-separated
+\Plaintitle{Using crlmm for Genotyping and Copy Number Estimation}
+\Shorttitle{Genotyping and Copy Number Estimation}
+
+\Abstract{
+
+  Genotyping platforms such as Affymetrix can be used to assess
+  genotype-phenotype as well as copy number-phenotype associations at
+  millions of markers. While genotyping algorithms are largely
+  concordant when assessed on HapMap samples, tools to assess copy
+  number changes are more variable and often discordant.  One
+  explanation for the discordance is that copy number estimates are
+  susceptible to systematic differences between groups of samples that
+  were processed at different times or by different labs.  Analysis
+  algorithms that do not adjust for batch effects are prone to
+  spurious measures of association. The \proglang{R} package \pkg{crlmm}
+  implements a multilevel model that adjusts for batch effects and
+  provides allele-specific estimates of copy number. This paper
+  illustrates a workflow for the estimation of allele-specific copy
+  number and integration of the marker-level estimates with
+  complimentary Bioconductor software for inferring regions of copy
+  number gain or loss. All analyses are performed in the statistical
+  environment \proglang{R}.  A compendium for reproducing the analysis is
+  available from the author's website
+  (\url{http://www.biostat.jhsph.edu/~rscharpf/crlmmCompendium/index.html}).
+
+}
+
+\Keywords{copy number, batch effects, robust, multilevel model, high-throughput, oligonucleotide array}
+\Plainkeywords{copy number, batch effects, robust, multilevel model, high-throughput, oligonucelotide array} %% without formatting
+
+\Address{
+  Robert Scharpf\\
+  Department of Oncology,\\
+  Johns Hopkins University School of Medicine, \\
+  550 N. Broadway, Suite 1103\\
+  Baltimore, MD 21218\\
+  E-mail: \email{rscharp1@jhmi.edu}
+
+
+\vspace{1em}
+
+  Rafael Irizarry and Ingo Ruczinski\\
+  Department of Biostatistics\\
+  Johns Hopkins Bloomberg School of Public Health\\
+  615 North Wolfe Street\\
+  Baltimore MD 21218\\
+  E-mail:\email{rafa@jhu.edu} and \email{ingo@jhu.edu}
+
+  \vspace{1em}
+
+  Matthew Ritchie\\
+  Bioinformatics Division\\
+  The Walter and Eliza Hall Institute of Medical Research\\
+  1G Royal Parade\\
+  Parkville, Victoria 3052\\
+  Australia
+  E-mail: mritchie@wehi.edu.au
+  \vspace{1em}
+
+  Benilton Carvalho\\
+  Department of Oncology\\
+  University of Cambridge\\
+  CRUK Cambridge Research Institute\\
+  Li Ka Shing Centre\\
+  Robinson Way\\
+  Cambridge CB2 ORE\\
+  United Kingdom
+  E-mail: Benilton.Carvalho@cancer.org.uk
+}
+
+\begin{document}
+
+<<options, echo=FALSE>>=
+options(prompt="R> ", continue=" ", device=pdf, width=68)
+outdir <- "/nexsan2/disk3/rscharpf/crlmmCompendium"
+if(!file.exists(outdir)) dir.create(outdir, recursive=TRUE)
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   INTRODUCTION
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section[Intro]{Introduction}
+\label{intro}
+
+Duplications and deletions spanning kilobases of the genome contribute
+to a substantial proportion of the genetic variation between
+individuals. Copy number variants (CNV) account for a greater
+proportion of differences in terms of sequence composition between two
+individuals than single nucleotide polymorphisms (SNPs)
+\citep{Zhang2009}.  CNV can arise through a number of mechanisms
+during meiosis and mitosis and are well known to be implicated in
+cancer through deletions that disrupt tumor suppressor genes or the
+amplification of oncogenes. Copy number alterations have also been
+implicated in several genomic disorders, including complex diseases
+such as schizophrenia and autism \citep{Karayiorgou2010, Pinto2010}.
+
+Current estimates regarding the frequency and size of segmental
+duplications and deletions in the human genome are largely based on
+high-throughput arrays that quantitate copy number on a genomic
+scale. Two such technologies are array comparative genomic
+hybridization (aCGH) and \textit{genotyping} platforms such as the
+Affymetrix oligonucleotide arrays and the Illumina BeadArrays. While
+each of these platforms rely on the hybridization of probes to sample
+preparations containing target DNA sequence, differences exist in the
+size of the probes, the number of probes per target sequence, and
+whether the hybridization is competitive.  Unlike aCGH, genotyping
+arrays can be used to identify copy-neutral regions of homozygosity
+that, while common in apparently normal individuals, can suggest rare
+genetic events such as uniparental isodisomy (UPD).  UPD has been
+implicated in heritable diseases such as Prader-Willi syndrome
+\citep{Altug-Teber2005}.  While the resolution is potentially much
+greater in genotyping arrays due to the shorter probe length, shorter
+probe lengths tend to result in more probe-to-probe variability with
+respect to cross-hybridization to the alternative allele, nonspecific
+binding, and differences in basepair composition. Reliable inference
+of copy number gain or loss at a single 25 - 100 basepair locus is not
+currently possible, and statistical methods that smooth the
+locus-level estimates as a function of the physical position in the
+genome are needed.
+
+Despite robust-to-outlier approaches for normalization, we have
+observed systematic differences in the copy number between groups of
+samples that can be perfectly predicted by the timestamp on the CEL
+files.  We refer to such systematic difference in copy number between
+groups of samples as batch effects. That larger studies tend to have
+more substantial batch effects than smaller studies is consistent with
+our conjecture that the nonstatic nature of experimental reagents and
+laboratory conditions contribute over time to batch
+effects. Irrespective of etiology, we have found that the scan date of
+the array and chemistry plate are useful surrogates for batch
+\citep{Scharpf2011}.  With an appropriate experimental design that
+involves randomization of samples to chemistry plate, batch effects
+are a nuisance variable that can be successfully modeled and
+removed.
+
+Existing analytic strategies for identifying alterations in copy
+number have largely adopted a one- or two-step approach.  In the
+one-step approach, assessments of CNV are made from the raw
+intensities using the joint distribution across samples. For instance,
+\cite{Zhang2009} developed a Correlation Matrix Diagonal Segmentation
+(CMDS) that identifies recurrent alterations in a population.  While
+we have not formally evaluated the impact of batch effects using this
+approach, it is important to note that the differences in raw
+intensities between groups of samples, whether driven by biological
+causes or by technological artifacts such as batch effects, are
+similar in terms of their effects on the data.  A safe strategy when
+adopting such an approach would be to filter loci associated with
+experimental factors such as chemistry plate or scan date.
+
+In contrast to the one-step approach, two-step approaches generally
+derive estimates of copy number and uncertainty at each marker,
+followed by smoothing of the marker-level estimates at the second
+stage. The motivation for the two-step approach is that the
+marker-level estimates are too imprecise to provide reliable copy
+number estimates.  However, marker-specific estimates can be useful
+for at least two reasons. First, single-locus estimates are typically
+derived from the joint distribution of intensities across samples and,
+through inspection of the joint distribution, batch effects can be
+modeled and removed. Secondly, plots of the marker-level estimates can
+be useful for assessing copy number mosaicism.  Mosaicism occurs when
+mixtures of cell populations with different mutations give rise to
+noninteger copy number estimates.  For instance, many tumors are
+comprised of a mixture of cell populations representing different
+levels of tumor evolution. The choice of appropriate statistical
+methods for smoothing at the second stage can therefore be informed by
+visualizations of the marker-level estimates. In particular, hidden
+Markov models (HMMs) \citep{Fridlyand2004, Colella2007, Wang2007a,
+  Scharpf2008} are generally more appropriate for germline diseases in
+which latent, integer copy number states are reasonable.  By contrast,
+segmentation algorithms such as circular binary segmentation
+\citep{Olshen2004, Venkat2007} may be more appropriate for diseases
+such as cancer. While segmentation algorithms estimate segment means,
+HMMs provide direct inference about the latent copy number states of
+interest and can be used to identify copy-neutral regions of
+homozygosity.
+
+This paper describes software for the first of a two-stage approach
+for identifying CNV in high-throughput genotyping arrays. All software
+was written using the statistical language \proglang{R}
+\citep{R2011}. We illustrate our approach on 1258 HapMap samples that
+were assayed on the Affymetrix 6.0 platform \citep{Consortium2010}.
+Section \ref{methods} gives a brief overview of the the statistical
+methods for preprocessing, genotyping, and copy number estimation.
+Section \ref{implementation} describes current data structures used by
+the \pkg{crlmm} package for organizing and annotating large datasets,
+as well as the organization of the compendium package for reproducing
+the figures in this manuscript. Section \ref{results} describes the
+2-step approach for identifying copy number alterations, highlighting
+the type of exploratory data analysis made possible in the \pkg{crlmm}
+package.  Closing remarks are provided in Section \ref{sec:disc}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   METHODS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Methods}
+\label{methods}
+
+% The estimation of bivariate normal prediction regions for integer
+% copy number has several useful applications for evaluating copy
+% number. For instance, one can estimate the raw copy number or the
+% posterior mean copy number at each marker.  Both the raw copy number
+% estimates and posterior means can be smoothed \via{} segmentation
+% algorithms such as circular binary segmentation (CBS) or
+% incorporated into hidden Markov models referenced in the previous
+% section. Alternatively, the prediction regions can be used to
+% directly estimate the emission probabilities in a hidden Markov
+% model.
+
+This section describes the steps for processing the raw fluorescence
+intensities from scanned arrays, genotyping the polymorphic markers,
+and deriving bivariate normal prediction regions for allele-specific
+copy number.  The bivariate normal prediction regions have several
+possible useful applications with respect to copy number estimation,
+including a simple translation to estimates of raw copy number at each
+marker.
+
+% We conclude the section with an overview for fitting the linear
+% model that serves as the basis for various copy number applications
+% illustrated in Sectionf \ref{results}.
+
+\subsection{Preprocessing}
+\label{method:preprocess}
+
+Preprocessing refers to normalization of the raw fluorescence
+intensities to remove array-to-array variability and the summarization
+of the normalized intensities of replicate probes.  The \pkg{crlmm}
+package adapts the robust multichip average (RMA), originally
+described for gene expression microarrays \citep{Irizarry2003}, to
+genotyping platforms.  We refer to this algorithm as SNP-RMA
+\citep{Carvalho2007a}.  Recent platforms for Affymetrix and Illumina
+include probes for polymorphic loci as well as probes for
+nonpolymorphic regions. At polymorphic loci, the raw intensities for
+each allele are quantile normalized \citep{Bolstad2003} to a target
+reference distribution obtained from the HapMap phase 2 samples
+\citep{Carvalho2007a}. The Affymetrix 6.0 platform contains 3 or 4
+identical probes for each allele. The normalized intensities for a set
+of identical probes are summarized by the median.  For nonpolymorphic
+loci, only one probe per loci is available and the intensities are
+quantile normalized without a subsequent summarization step.
+Additional details regarding the preprocessing of Affymetrix CEL files
+and Illumina IDAT files are described elsewhere \citep{Carvalho2007a,
+  Ritchie2009}.
+
+\subsection{Genotyping}
+\label{method:gt}
+Following the normalization and summarization of intensities at
+polymorphic loci, we apply the corrected robust linear mixture model
+(CRLMM) algorithm to genotype SNPs. This algorithm extends previous
+algorithms for genotyping, namely RLMM \citep{Rabbee2006} and BRLMM
+\citep{Affymetrix2006}. A key difference of our approach and our
+predecessors is the use of HapMap samples to train our algorithm. The
+CRLMM algorithm originally described in \cite{Carvalho2007a} has been
+adapted to accommodate changes in the technology of the more recent
+Affymetrix 5.0 and 6.0 platforms. Specifically, the probes for each
+locus are identical and lie on the same strand for the 5.0 and 6.0
+platforms, simplifying the estimation procedure. In addition, the
+implementation of CRLMM in the \pkg{crlmm} package does not provide a
+correction for fragment-length as the improvement to model fit has, in
+our experience, not justified the additional computation.  A recent
+comparison paper describes genotyping algorithms for Illumina's
+Infinium arrays \citep{Ritchie2011}.
+
+% We briefly outline key features of the current algorithm and refer
+% the interested reader to \cite{Carvalho2010a} for a more in-depth
+% discussion of the factors motivating the implementation and the
+% estimation procedure used for model parameters.
+
+The CRLMM algorithm provides genotype calls and quality scores for all
+polymorphic markers through a hierarchical model described in detail
+elsewhere \citep{Carvalho2010a}.  One critical aspect of our the
+procedure is to formulate the genotype classification problem in the
+space of the log-ratio of the observed intensities $I$ for the A and B
+alleles versus the overall strength of the $A$ and $B$
+intensities. More precisely, the y and x axes in a $M$ versus $S$
+scatter plot are defined by $\log_2(I_{A}/I_{B})$ and
+$\log_2(\sqrt{I_{A} \times I_{B}})$, respectively.  Our previous work
+has demonstrated that the $M$ are more robust to batch effects than
+the bivariate distribution of log $A$ and log $B$.  For example, see
+Supplementary Figure 1 in \cite{Scharpf2011}.  We also note that the
+separation of the $M$ values for the diallelic genotypes $g$, $g \in
+\{AA, AB, BB\}$, is smaller for SNPs with very low or very high values
+of $S$.  For example, Figure 7B of \cite{Carvalho2007a} depicts the
+relationship of $M$ and $S$ for one sample. %\cite{Carvalho2010} model
+%the relationship of $M$ and $S$ hierarchically.
+%$j$ through a smooth function of the intensity strength at SNP $i$,
+%denoted by $f_{jk}(S_{ijk})$ \citep{Carvalho2007a}.
+%Using HapMap to provide initial estimates of parameters in the
+%hierarchical model, empirical Bayes procedures are used to shrink
+%estimates of location and scale by borrowing strength from the large
+%number of available SNPs.
+Taken together, these observations motivated the development of a
+hierarchical model to account for systematic sources of variation from
+batch and intensity strength.  Following the estimation procedure for
+model parameters outlined elsewhere \citep{Carvalho2010a}, the
+inferred genotypes are based on the derivation of the posterior
+probability for the true genotype $Z$. Assuming that there are no
+batch effects, a simplification of the posterior probability for SNP
+$i$ in sample $k$ is given by
+\begin{equation}
+  \Prob(Z_{ik} = g | M_{ik} = m) = \frac{\Prob(Z_{ik=g}) h_{M_{ik} |
+      Z_{ik}=g}(m)}{\sum_{g'} \Prob(Z_{ik=g'}) h_{M_{ik} | Z_{ik}=g'}(m)}
+  \mbox{~for~} g' \in \{\A\A, \A\B, \B\B\},
+\end{equation}
+\noindent where $h_{m_{ik} | Z_{ik}}(m)$ represents a normal
+density.  See equations (4) and (6) of \cite{Carvalho2010a} for the
+derivation of the mean and variance for the normal density.  The
+genotype call, $\hat{Z}_{ik}$, and confidence score, $q_{ik}$, for SNP
+$i$ in sample $k$ are given by
+\begin{eqnarray}
+  \label{eq:posteriorProb}
+  \hat{Z}_{ik} & = & \mbox{arg max}_{g} \Prob(Z_{ik} = g | M_{ik} = m) \mbox{~and~}\\
+  q_{ik} & = & \max_{g} \Prob(Z_{ik} = g | M_{ik} = m),
+\end{eqnarray}
+\noindent respectively. Our implementation maps the scores $q_{ik}$ from the $[0,
+1]$ interval to integers using the relationship
+\begin{equation*}
+ M(q_{ik}) = \mbox{round}(-1000 * \log2(q_{ik})),
+\end{equation*}
+as it allows efficient storage with minimum loss.
+
+In summary, the CRLMM algorithm estimates genotypes through a
+hierarchical model for the log ratios of A:B intensities that accounts
+for the dependency on intensity strength, batch effects, and the
+uncertainty of parameters estimated from the training step.  For each
+platform design supported by our software, we provide one annotation
+package that contains parameters estimated from the training data for
+every SNP-genotype combination.
+
+
+\subsection{Bivariate normal prediction regions for integer copy  number}
+\label{method:cn}
+
+In large studies, batch effects become evident as the strength of the
+A and B intensities is sensitive to changes to laboratory conditions,
+reagents, or personnel that change over time. Estimation of absolute
+copy number is a more difficult enterprise than genotyping in part
+because batch effects and true differences in copy number are similar
+in terms of their effects on the data.  While quantile normalization
+is an effective means for removing array to array variation and
+provides additional robustness to outliers in individual samples, such
+normalization procedures are insufficient for removing batch effects.
+However, algorithms that assign biallelic genotypes to samples based
+on the ratio of log intensities, as implemented in the
+\pkg{crlmm} algorithm, are robust to batch effects.  We utilize
+CRLMM's robustness to batch effects to guide the estimation of
+parameters in a multilevel model for copy number.
+
+This section briefly describes the algorithm for estimating
+batch-specific bivariate normal prediction regions of integer copy
+number.  Typically, the 96-well chemistry plate is a useful surrogate
+for batch as the samples from a given plate are often processed at
+similar times.  As indicated above, the resulting prediction regions
+can be used to (i) compute a posterior mean copy number at each
+marker, (ii) incorporated directly into a hidden Markov model to infer
+regions of copy number gain and loss, or (iii) used to derive an
+estimate of \emph{raw} copy number.  The estimation procedure extends
+probe-level models for estimating gene expression (see \cite{Wu2005})
+and an early version of an algorithm for estimating copy number
+described by \cite{Wang2008a}.  As of this writing, the algorithm
+requires the genotypes of the experimental dataset and does not use
+any training data, such as HapMap, as priors. As a consequence, the
+current implementation requires a minimum of 10 samples per batch for
+estimating parameters for copy number, with larger batch sizes (e.g,
+90 or more samples) preferred.
+
+At each SNP, we (i) calculate robust estimates of the mean and
+variance for each of the diallelic genotypes, (ii) shrink the
+empirical estimates to the within-batch averages estimated from a
+large number of SNPs, (iii) impute the location and variance of
+unobserved genotypes, and (iv) fit a linear model to the
+within-genotype cluster medians. More formally, we propose the
+following theoretical model for the observed intensity $I$ at SNP $i$,
+batch $j$, sample $k$, and allele $l$:
+
+% \input{snpModel2}
+\begin{eqnarray}  \nonumber
+  \left[
+    \begin{array}{c}
+      I_{ijkl}
+   \end{array}
+  \right]
+  &
+  =
+  &
+   \left[
+      \left(
+        \begin{array}{c}
+          \mbox{Optical}_{ijl} + \mbox{Nonspecific}_{ijl}
+       \end{array}
+      \right)
+    \right.
+    \times
+    \left.
+      \left(
+        \begin{array}{c}
+          \delta_{ijkl}
+       \end{array}
+        \right)
+    \right]
+   +
+   \left[
+      \begin{array}{c}
+        \mbox{Specific}_{ijl}
+     \end{array}
+    \right.
+    \times
+    \left.
+      \begin{array}{c}
+        \varepsilon_{ijkl}
+     \end{array}
+    \right]
+\\
+\label{eq:snplevel2}
+ &\equiv&
+ \left[
+   \left.
+     \begin{array}{c}
+       \nu_{ijl}
+    \end{array}
+   \right.
+ \right.
+ \times
+ \left.
+   \left.
+   \begin{array}{c}
+     \delta_{ijkl}
+  \end{array}
+ \right.
+\right]
+%  &
+  +
+%  &
+  \left[
+    \begin{array}{c}
+      \phi_{ijl}c_{ijkl}
+   \end{array}
+  \right.
+  \times
+  \left.
+    \begin{array}{c}
+       \varepsilon_{ijkl}
+    \end{array}
+   \right] \mbox {~for~} l \in \{\A, \B\},
+\end{eqnarray}
+\noindent where the errors $\delta$ and $\varepsilon$ account for
+array to array variation within a batch and are assumed to be
+approximately log-normal.  Fluorescence arising from nonspecific
+hybridization and optical background are collectively parameterized by
+$\nu$. To estimate the $\nu$ and $\phi$ in model \eqref{eq:snplevel2},
+we assume that the $c_l$ are known from the diallelic genotype calls.
+For instance, $c_\A$ takes the value 0, 1, or 2 for genotypes BB, AB,
+and AA, respectively.  Next, we fit a regression line to estimates of
+the median intensity for each genotype stratum using weighted least
+squares (equation (7) of \cite{Scharpf2011}).  The intercept and slope
+of the regression line correspond to our estimates of $\nu_{\A}$ and
+$\phi_{\A}$ in model \eqref{eq:snplevel2}, respectively.  We repeat
+the procedure for allele B. %Conversely, $\nu_\B$ is the
+%expected median intensity for subjects with genotype AA.
+As in \cite{Wang2008a}, we assume that the joint distribution of the
+log intensities conditional on the allelic copy number is
+approximately bivariate normal:
+
+\begin{eqnarray} \label{eq:bvn}
+  \begin{array}{ccc}
+    \left[
+      \begin{array}{c}
+        \log_2(I_{ijk\A})\\
+        \log_2(I_{ijk\B})
+      \end{array}
+    \right.
+    \left.
+      \Biggl|
+    \begin{array}{c}
+      C_{ijk\A}=c_\A \\
+      C_{ijk\B}=c_\B
+    \end{array}
+  \right]
+      &
+      \sim
+      &
+      \begin{array}{c}
+        {\rm N}\left(
+          \left[
+          \begin{array}{c}
+            \log_2 (\nu_{ij\A} + c_{\A}\phi_{ij\A})\\
+            \log_2 (\nu_{ij\B} + c_{\B}\phi_{ij\B})
+          \end{array}
+          \right]
+          ,
+          \begin{array}{c}
+            \mbox{\boldmath $\Sigma$}_{ij}
+          \end{array}
+        \right)
+      \end{array}
+\end{array}
+\end{eqnarray}
+\noindent We obtain initial estimates of the covariance $\Sigma$
+empirically, and subsequently shrink the the covariance to improve
+estimates for genotypes with few observations \citep{Scharpf2011}.
+The means of the bivariate normal in equation \ref{eq:bvn} are
+obtained by plugging in estimates of $\nu$ and $\phi$ from the linear
+model.  Section \ref{results} provides code for plotting the
+predictions regions as well as the \emph{raw} copy number.  The raw
+copy number is the sum of the allele-specific estimates, ${\hat c_\A}
++ {\hat c_\B}$, obtained through the following relationship:
+
+\begin{eqnarray}
+  \label{eq:cnK}
+{\hat c}_{ijkl} &=& \mbox{max}\left\{\frac{1}{{\hat
+    \phi}_{ijl}}\left(I_{ijkl}-{\hat \nu}_{ijl}\right), ~0\right\}
+\mbox{~for~} l \in \{\A, \B\}.
+\end{eqnarray}
+
+For nonpolymorphic markers and monomorphic SNPs, we follow a similar
+procedure using SNPs with complete data to predict the unobserved
+genotypes.  For example, the unobserved `A' and `null' genotypes for
+monomorphic AA SNPs and nonpolymorphic loci are imputed from a
+regression model using SNPs with all three diallelic genotypes
+observed as explanatory variables.  The linear model is fit to the
+imputed genotype-cluster medians and variances using weighted least
+squares as described previously \citep{Scharpf2011}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Software
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+\label{implementation}
+
+This section provides a brief overview of this compendium and the data
+structure adopted by \pkg{crlmm} for binding information on the samples,
+markers, and experiment in a single object.
+
+% for encapsulating the scanned intensities from the array, the CRLMM
+% genotype calls and confidence scores, phenotypic information on the
+% samples, annotation of the Affymetrix probes, and various
+% batch-specific parameters required for copy number estimation.
+% meta-data on the experiment.
+
+\textbf{Compendium:} This document is written using \verb@Sweave@
+\citep{Leisch2003} and is included in the \pkg{crlmmCompendium}
+\proglang{R} package.  The \pkg{crlmmCompendium} package can be
+downloaded from
+\url{http://www.biostat.jhsph.edu/~rscharpf/crlmmCompendium}.  The raw
+CEL files used in this analysis are publicly available
+(\url{http://hapmap.ncbi.nlm.nih.gov/downloads/raw_data/hapmap3_affy6.0}). Manageable
+subsets of the markers and samples from the processed data are
+included with the \pkg{crlmmCompendium} package for the purpose of
+reproducing the figures and illustrating key features of the software.
+The website for the compendium places code extracted from this
+\verb@Sweave@ document for each of the figures alongside thumbnail
+versions of the figures.  Reproducing the complete analysis described
+in this \verb@Sweave@ file requires two additional steps. First, one
+would need to obtain the CEL files for the HapMap phase 3 data and
+verify that any additional \proglang{R} packages beyond those that are
+required for installing the compendium are available.  See Section
+\ref{sec:session} for the complete \proglang{R} session information
+from our analysis.  Secondly, the following code chunk specifying the
+path to the CEL files and the directory to store results should be
+edited as appropriate.
+
+<<specifyPath, eval=FALSE>>=
+outdir <- "<PATH_TO_CEL_FILES>"
+@
+
+<<outdir, echo=FALSE>>=
+pathToCels <- "/thumper/ctsa/snpmicroarray/hapmap/raw/affy/phase3_1m"
+@
+
+\noindent In addition to the above tasks, we suggest caching long
+computations such that repeated \verb+Sweave+ calls can be loaded from
+disk. We used the \proglang{R} package \pkg{cacheSweave}
+(\url{http://cran.r-project.org/web/packages/cacheSweave/index.html})
+for this purpose and alert the user to blocks of code in Section
+\ref{results} that may be useful for caching \citep{Peng2009}.
+Subsequent \verb+Sweave+'s calls of this file are fast and can be
+performed in an interactive session as cached computations are lazy
+loaded into the global environment.
+
+\textbf{\pkg{crlmm}:} The \proglang{R} package \pkg{crlmm} is available from
+Bioconductor \citep{Gentleman2004}.  New releases of \pkg{crlmm} are
+available twice per year.  The \pkg{crlmm} package utilizes the
+\textsf{S}4 class \CNSet{} container for encapsulating the normalized
+intensities and various other aspects of the experiment and
+samples. The \CNSet{} class extends the basic \eSet{} container
+defined in \Biobase{}.  As with other \eSet{} extensions, phenotypic
+data on the samples, annotation for the probes, and meta-data on the
+experiment are also included in the container. Through inheritance,
+all of the general methods defined for the \eSet{} class are available
+for the \CNSet{} class.  The \CNSet{} is specialized for copy number
+estimation as follows.  Elements of the \verb+assayData+ slot include
+the normalized intensities for the A and B alleles, the CRLMM genotype
+calls, and the CRLMM confidence scores.  Data and meta-data for the
+samples and probes are stored in the \verb+phenoData+ and
+\verb+featureData+ slots, respectively.  The class defines two
+additional slots important for copy number estimation: \texttt{batch}
+and \texttt{batchStatistics}.  The \texttt{batch} slot contains a
+character vector that describes the batch in which the CEL files were
+processed.  The character vector must be the same length as the number
+of samples.  The \verb+batchStatistics+ slot is similar to the
+\verb+assayData+ slot, but as the name implies the elements in the
+environment are SNP- and batch-specific statistical summaries needed
+for copy number estimation, including robust estimates of the mean and
+variance for each genotype cluster and parameters from the linear
+model in equation \eqref{eq:snplevel2}. Each element in the
+\verb+batchStatistics+ environment has dimension $I \times J$, where
+$I$ is the total number of markers (SNPs and nonpolymorphic probes)
+and $J$ is the total number of batches.  Several examples for
+accessing the batch statistics are illustrated in Section
+\ref{results}.  Objects of the \CNSet{} class are typically
+instantiated by the \Rfunction{genotype}.  However, new objects can
+also be derived by the ``['' method that subsets rows (markers) and
+columns (samples).
+
+\texttt{Parallelization and large data support:} Several of the
+algorithms described in the previous section have been written to
+allow parallelization of computation across multiple processors or
+nodes. For instance, the SNP-RMA and CRLMM algorithms, as well as the
+algorithm for copy number estimation allow for parallel computing.
+The infrastructure for parallel computing is handled by the \proglang{R}
+package \snow{} available from CRAN (\url{http://cran.r-project.org}).
+
+We have made several adaptations to reduce the memory footprint of key
+functions for processing large datasets.  The reduction is primarily
+made possible by the use of data structures and protocols provided by
+the \pkg{ff} package
+(\url{http://cran.r-project.org/web/packages/ff/index.html}) for
+storing objects on disk rather than in memory.  Algorithms such as
+SNP-RMA and CRLMM require only subsets of the samples or markers,
+respectively.  As a consequence, data can be read into memory,
+processed, and summaries written to file without excessive memory
+requirements.  We manage the location of files on disk and the size of
+the data chunks (subsets of rows and/or columns) through three utility
+functions provided as part of the \pkg{oligoClasses} package:
+\Rfunction{ldPath}, \Rfunction{ocProbesets}, and
+\Rfunction{ocSamples}.  Documentation for these functions is available
+in the \pkg{oligoClasses} package and illustrated in Section
+\ref{results}.  Currently, all of the elements in the \verb+assayData+
+slot and \verb+batchStatistics+ slot are \pkg{ff} objects, as opposed to
+ordinary matrices.  While the use of \pkg{ff} objects has many
+advantages, operations on these objects require more careful attention
+to avoid accidentally calling too much data from disk and swamping the
+available memory.  In general, this can be achieved by specify both
+the $i$ and $j$ arguments to the ``['' method. However, one should be
+careful in the order of operations for accessing data from a \CNSet{}
+object. For example, the normalized A allele intensities for the first
+5 SNPs could be obtained by either of the following commands:
+<<orderOfOperations,eval=FALSE>>=
+as.matrix(A(cnSet)[1:5, ])
+as.matrix(A(cnSet[1:5, ]))
+@
+\noindent While the results from both commands would be identical, the
+first command is the preferred approach as the I/O for the second
+command can be substantially greater.  In particular, the second
+command subsets every element in the \verb+assayData+ and
+\verb+batchStatistics+ slot prior to extracting the normalized A
+allele intensities.  Note also that we have wrapped both calls by the
+function \Rfunction{as.matrix}.  This is important when dealing with
+\pkg{ff} objects as the object returned by assessors for \verb+assayData+
+and \verb+batchStatistics+ can be either of class \Rclass{data.frame}
+or \Rclass{matrix}, depending on the size of the data set.  Explicit
+coercion to class matrix avoids bugs that could arise, for instance,
+by a method that behaves differently for \Rclass{data.frame} and
+\Rclass{matrix} objects.
+
+\paragraph{Known limitations:} A limitation of the current design is that
+the \texttt{assayData} elements must all have the same dimension.
+However, the nonpolymorphic markers only interrogate one allele and we
+do not estimate a genotype at these markers.  Implicitly, the assay
+data elements for allele B, the genotype calls, and the genotype
+confidence scores for nonpolymorphic markers are larger than required
+and store many \verb+NA+s.  For example, the matrix for genotype calls
+in the Affymetrix 6.0 platform are almost twice as large as needed.
+The advantage of equally-sized assay data elements is that (i)
+information on the features can be represented in a single location
+that is bound to the assay data and feature annotation, (ii)
+subsetting objects of the class does not require any special handling,
+and (iii) fewer bugs due to the simplicity of the design and the
+inheritance of well-tested methods that are defined for the \eSet{}
+class. We prefer the added reliability of the current structure to the
+potential improvements in efficiency, particularly since the
+implementation does not generally effect the memory requirements as
+the \pkg{ff} package stores the data on disk.
+
+Currently, copy number estimation is not available for samples in
+which the batch size is fewer than 10.  Unlike the $\log_2(A/B)$
+ratio, the strength of $A$ and $B$ intensities is sensitive to batch
+making training with data such as HapMap more difficult.  The
+practical consequence is that \pkg{crlmm} does not currently estimate the
+parameters in the linear model for batches with fewer than 10 samples,
+and may provide noisy estimates of copy number for batches with fewer
+than 50 samples. Future versions of \pkg{crlmm} may include solutions for
+small data scenarios.
+
+Finally, several files for storing the data will be created by
+utilities in the \pkg{ff} package. If these files are later moved to a
+different location or removed, the accessors for data in the \CNSet{}
+object will no longer work.  Users should either use the
+\Rfunction{clone} utility in the \pkg{ff} package for relocating files on
+disk, or be prepared to rerun the genotyping and copy number
+estimation steps. As in any statistical analysis using \proglang{R}, saving
+the exact session information can be useful for reproducing a previous
+analysis.
+
+
+\section{Results}
+\label{results}
+
+This section describes a 2-step approach for identifying regions of
+copy number alterations.  In the first step, raw copy number estimates
+at each marker are obtained using the \pkg{crlmm} package.  In the second
+step, the raw copy number estimates are smoothed using a hidden Markov
+model implemented in the \pkg{VanillaICE} package and by circular binary
+segmentation implemented in the \pkg{DNAcopy} package.  The
+visualizations provided in this section use \pkg{lattice} graphics for
+effective multi-panel displays \citep{Sarkar2008}.
+
+\subsection{Fitting the multilevel model}
+
+We begin our analysis of the HapMap data by loading the compendium and
+various dependencies for our analysis of the HapMap data.
+<<compendium, results=hide>>=
+library("ff")
+library("Biobase")
+library("genefilter")
+library("IRanges")
+library("MASS")
+library("VanillaICE")
+library("crlmmCompendium")
+@
+
+\noindent As the result of the above commands, the \pkg{ff} package is in
+the search path and support for large datasets is automatically
+enabled. We set the path to store objects on disk and fine-tune the
+size of the data chunks used by the CRLMM algorithm using the three
+utility functions mentioned in the previous section.
+<<jsspack, results=hide>>=
+ldPath(outdir)
+ocProbesets(50e3)
+ocSamples(200)
+@
+%\noindent In addition to enabling large data support, we will enable
+%the caching of long computations by using the \pkg{cacheSweave} package
+%available from the CRAN repository.  The \proglang{R} objects created in
+%cached code chunks will be saved to disk using the filepath specified
+%by the \Rfunction{setCacheDir} function.  A flag that a code chunk
+%should be cached is indicated by using the option \verb+cache=TRUE+ in
+%the code chunk declaration.
+\noindent Finally, the \pkg{cacheSweave} package is loaded for caching
+output from long code chunks and a directory for storing the cached
+computations is declared.
+<<enableCaching>>=
+library("cacheSweave")
+setCacheDir(outdir)
+@
+
+We complete the set-up for our analysis of the HapMap samples by
+specifying the names of the CEL files and defining a surrogate for
+batch. As indicated previously, a useful surrogate for batch is the
+scan date of the array or the chemistry plate.  For the HapMap phase 3
+data, the chemistry plate is the first 5 letters of the CEL
+filename. We extract the plate names from the filenames in the
+following code.
+<<genotyping>>=
+filenames <- list.celfiles(pathToCels, full.names=TRUE, pattern=".CEL")
+plate <- substr(basename(filenames), 1,5)
+@
+
+The steps for preprocessing and quantile-normalizing Affymetrix CEL
+files in \pkg{crlmm} are wrapped in the function
+\Rfunction{genotype}.  (Users that only require the genotype calls and
+do not intend to estimate copy number should use the \Rfunction{crlmm}
+function instead.)  The \genotype{} function is a wrapper for several
+important steps. First, the function initializes an object of class
+\CNSet{}, verifying the validity of the data passed to the
+\texttt{batch} argument of this function. Secondly, the function reads
+the raw intensities from the CEL files and normalizes the intensities
+in a memory efficient manner \via{} the SNP-RMA algorithm
+\citep{Bolstad2003, Carvalho2007a}.  The nonpolymorphic markers are
+also quantile-normalized to a target reference distribution estimated
+from HapMap. %[[SHOULD WE USE THE SNP TARGET %DISTRIBUTION]].
+Finally, we call the CRLMM algorithm to genotype and estimate genotype
+confidence scores at SNPs. As the preprocessing and genotyping is
+computationally intensive, we set \verb+cache=TRUE+ in the declaration
+of the following code chunk.
+
+<<genotypeLD,eval=FALSE>>=
+cnSet <- genotype(filenames=filenames, cdfName="genomewidesnp6", batch=plate)
+@
+
+<<loadCnSet, echo=FALSE>>=
+load("../../data/cnSet.rda")
+@
+\noindent The object returned by the \Rfunction{genotype} function,
+assigned to the name \Robject{cnSet} in the above command, is an
+instance of the \S{}4 class \CNSet{}.  In addition to specifying batch
+as an argument to \genotype{}, one may optionally specify the gender.
+If gender is not specified as in the above example, the gender is
+imputed.  Typically, the imputed gender should be accurate as a large
+number of markers are available to estimate gender. However, in cancer
+samples or diseases with chromosome X or Y aneuploidy, the gender
+calls may be incorrect or ambiguous.  Otherwise, one reason to allow
+the imputation is as a check for possible inconsistencies in the
+supplied documentation.  The \Rfunction{show} method for class
+\CNSet{} provides a concise summary of its contents.
+
+<<show>>=
+show(cnSet)
+@
+
+
+Following preprocessing and genotyping, the SNR (see Section
+\ref{methods}) can be a useful statistic for quality control.  In some
+instances, it may be preferable to remove samples with low SNR from
+downstream analyses.  The SNR is stored in the \verb+phenoData+ slot
+of the \Robject{cnSet} object and can be accessed and plotted as
+follows.  See Figure \ref{fig:snr} for a histogram of the SNR values
+in the HapMap phase 3 study.
+
+<<snrAccessor>>=
+open(cnSet$SNR)
+SNR <- cnSet$SNR[]
+close(cnSet$SNR)
+@
+
+<<snr>>=
+(snrfig <- histogram(~SNR, breaks=100))
+@
+
+<<snrFig,fig=TRUE,include=FALSE, echo=FALSE, width=8, height=5>>=
+pars <- trellis.par.get()
+pars$axis.text$cex <- 0.6
+pars$xlab.text$cex <- 0.8
+pars$ylab.text$cex <- 0.8
+pars$main.text$cex <- 1
+trellis.par.set("axis.text", pars$axis.text)
+trellis.par.set("xlab.text", pars$xlab.text)
+trellis.par.set("ylab.text", pars$xlab.text)
+trellis.par.set("main.text", pars$main.text)
+print(snrfig)
+@
+
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figures/manuscript-snrFig.pdf}
+  \caption{\label{fig:snr} Signal to noise ratio for the HapMap phase
+    3 data.  Signal to noise ratios below 5 can indicate problems with
+    data quality.  }
+\end{figure}
+
+
+<<dataObject-snr, echo=FALSE>>=
+save(SNR, file="../../data/SNR.rda")
+@
+
+% This is tricky.  Running this for the first time, this would fail
+% without re-installing the package.  If we use eval=FALSE, then the
+% code chunk inserted into the webpage would also have eval=FALSE.  By
+% checking if the object exists, this should not be evaluated inside
+% the compendium but would be evaluated in the website code chunks.
+<<loadObject-snr, echo=FALSE>>=
+if(!exists("SNR")) data(SNR)
+@
+
+By default, the sample names for the \Robject{cnSet}, accessible by
+\Rfunction{sampleNames(cnSet)} are the CEL filenames. The
+\pkg{crlmmCompendium} contains a mapping from the CEL filenames
+to the more familiar HapMap identifiers.  The following code changes
+the sample labels from the filename to the HapMap identifiers.  Note
+that we generally suggest using the filenames for the sample names,
+but have adopted the more concise HapMap names in this analysis to
+improve readability of the resulting output.
+
+<<useHapmapLabels,cache=TRUE>>=
+cnSet$celFiles <- sampleNames(cnSet)
+sampleNames(cnSet) <- getHapMapIds(cnSet)
+sampleNames(cnSet)[1:5]
+@
+
+
+The metadata on the samples and features can be listed with the
+\Rfunction{varLabels} and \Rfunction{fvarLabels}, respectively. %The
+<<listMetadata>>=
+varLabels(cnSet)
+fvarLabels(cnSet)
+@
+
+Recall that the assay data elements in the \Robject{cnSet} object
+contain pointers to large objects on disk. One can list all of the
+\pkg{ff} files created during the initialization of the container
+as in the following code chunk.  Once created, these files should not
+be moved or deleted.
+<<listfiles>>=
+list.files(ldPath(), pattern="\\.ff$")[1:2]
+@
+\noindent The underlying data structures are intended to be handled
+seamlessly through the provided interface in \pkg{crlmm}. For
+instance, in the following code chunk we open file connections to the
+\pkg{ff} objects and access the quantile normalized intensities for the
+first 5 markers and the first 6 samples for allele A.
+<<A>>=
+invisible(open(cnSet))
+as.matrix(A(cnSet)[1:5, 1:6])
+@
+\noindent The above query is not instantaneous as these items pull
+data from the \Robject{ff} files on disk to active memory.  The
+bracket operator without arguments, as in \verb@[,]@, would pull data
+from all markers and all samples from disk to active memory, defeating
+the purpose of using the \pkg{ff} package.
+
+In the analysis of genomewide association data, it is often useful to
+visualize the genotype clusters for loci of interest. All that is
+required for such a visualization is the platform-specific identifier
+for the SNP of interest. In the example below, we plot the genotype
+clusters for SNP\_A-2131660.  The object \Robject{genotypeSet} that
+contains the data for this SNP is available in the \pkg{crlmmCompendium}
+package and was generated from the following commands.
+
+<<genotypeSet, cache=TRUE>>=
+invisible(open(cnSet))
+##genotypeSet <- cnSet[match("SNP_A-4247386", featureNames(cnSet)), ]
+genotypeSet <- cnSet[match("SNP_A-2131660", featureNames(cnSet)), ]
+invisible(close(cnSet))
+@
+
+<<dataObject-genotypeSet, echo=FALSE>>=
+save(genotypeSet, file="../../data/genotypeSet.rda")
+@
+
+<<loadObject-genotypeSet, echo=FALSE>>=
+if(!exists("genotypeSet")) data(genotypeSet)
+@
+
+The \proglang{R} function \Rfunction{prePredictPanel} in the
+\pkg{crlmmCompendium} package extracts the normalized intensities, the
+genotype calls, and the confidence scores for the genotypes and stores
+the results in an object of class \Rclass{data.frame}.  The resulting
+\Rclass{data.frame} object will be useful for creating trellis
+displays with the \pkg{lattice} package.
+
+<<dataframeForClusterPlot>>=
+df <- prePredictPanel(genotypeSet)
+@
+
+We will construct 3 scatterplots of this SNP using colors to annotate
+different aspects of the data. The following code selects a color for
+the plotting symbols that indicates the CRLMM genotype call.
+
+<<genotypeColor>>=
+fill1 <- brewer.pal(3, "Set1")[df$gt]
+@
+
+CRLMM provides a genotype call for \emph{all} SNPs (no missing values)
+and a confidence score for the called genotype (equation
+\eqref{eq:posteriorProb}).  If one wishes to exclude SNPs with low
+confidence scores, visualizations of the confidence scores in the
+context of the scatterplot can be useful.  In the following code, we
+select a grey scale for the confidence score with darker shades of
+grey indicating less confidence ranging to which (confidence = 1).  As
+the confidence scores for this SNP were all high ($\geq$ 0.89), we
+selected a scale such that scores near 0.89 are shaded dark.
+
+<<confidenceColor>>=
+gt.conf <- df$gt.conf
+min.conf <- min(gt.conf)
+max.conf <- max(gt.conf)
+sc <- (gt.conf - min.conf)/(max.conf-min.conf)
+fill2 <- sapply(sc, grey)
+@
+
+Finally, we choose a subset of samples to highlight the batch effects
+frequently observed in large studies in which the samples are
+processed over an extended period of calendar time.  As mentioned
+previously, the scan date of the array or the chemistry plate are
+often useful surrogates for batch effects.  The scan dates of the
+array are stored in the \verb+protocolData+ slot of the \CNSet{}
+object and can be extracted using the \$ operator:
+
+<<scandates>>=
+dt <- strftime(protocolData(genotypeSet)$ScanDate, "%Y-%m-%d", usetz=FALSE)
+range(dt)
+@
+
+We expect that the normalized intensities for samples processed near
+the beginning of the study may be systematically different from
+samples processed near the end of the study.  As we are using plate as
+a surrogate for batch, we select two plates in which the samples were
+processed at very different times.
+
+<<dt.batch>>=
+dt.batch <- split(dt, batch(genotypeSet))
+sapply(dt.batch, range)
+@
+
+Note that the samples on the SCALE plate were processed at the
+beginning of April of 2007, whereas samples on the SLOTH plate were
+processed in January of 2008.  We select different colors for SCALE
+and SLOTH, and use white for the remaining samples.
+
+<<plateColor>>=
+batch.scale <- which(batch(genotypeSet)=="SCALE")
+batch.sloth <- which(batch(genotypeSet)=="SLOTH")
+plate.cols <- brewer.pal(8, "Accent")[c(3, 8)]
+fill3 <- rep("white", nrow(df))
+fill3[batch.scale] <- plate.cols[1]
+fill3[batch.sloth] <- plate.cols[2]
+@
+
+Next we replicate the \Rclass{data.frame} object 3 times, attaching a
+different set of fill colors for each replicate.  The factor
+\verb+colorby+ will be used as a conditioning variable in the lattice
+graphic such that a separate panel is created for each factor.
+
+<<expandDataFrame>>=
+df2 <- rbind(df, df, df)
+df2$fill <- c(fill1, fill2, fill3)
+colorby <- c("genotype", "confidence score", "plate")
+df2$colorby <- factor(rep(colorby, each=nrow(df)), levels=colorby, ordered=TRUE)
+@
+
+The following call to the \Rfunction{xyplot} creates the desired
+multi-panel display in Figure \ref{fig:clusterPlot}. Note that the
+plate- (batch-) effect is in the A+B direction and that the genotypes
+are robust to the batch-effect.  As described in Section
+\ref{methods}, our copy number analysis will use chemistry plate as a
+surrogate for batch and the robust-to-batch CRLMM genotypes to train
+the linear model.
+
+<<clusterPlot>>=
+(ABfig <- xyplot(A~B|colorby, df2,
+	      panel=function(x, y, col, fill, plate.cols, ..., subscripts){
+		      panel.grid(h=5,v=5)
+		      panel.xyplot(x,y, col="grey60", fill=fill[subscripts], ...)
+		      if(panel.number() == 3){
+			      ## such that these plates are plotted last
+			      lpoints(x[batch.scale], y[batch.scale], fill=plate.cols[1], ...)
+			      lpoints(x[batch.sloth], y[batch.sloth], fill=plate.cols[2], ...)
+		      }
+	      },
+	       aspect="iso",
+	       fill=df2$fill, col=df2$col, cex=0.6, pch=21, plate.cols=plate.cols,
+	       xlab=expression(log[2](I[B])),
+	       ylab=expression(log[2](I[A])), main=featureNames(genotypeSet), layout=c(3,1),
+	       par.strip.text=list(lines=0.9, cex=0.6)))
+@
+
+<<clusterColors,fig=TRUE,include=FALSE,echo=FALSE,width=8,height=5>>=
+pars <- trellis.par.get()
+pars$axis.text$cex <- 0.5
+pars$xlab.text$cex <- 0.6
+pars$ylab.text$cex <- 0.6
+pars$main.text$cex <- 0.7
+trellis.par.set("axis.text", pars$axis.text)
+trellis.par.set("xlab.text", pars$xlab.text)
+trellis.par.set("ylab.text", pars$xlab.text)
+trellis.par.set("main.text", pars$main.text)
+print(ABfig)
+@
+
+\begin{figure}[t!]
+  \vspace{-3em}
+  \centering
+  \includegraphics[width=\textwidth]{Figures/manuscript-clusterColors.pdf}
+  \vspace{-5em}
+  \caption{\label{fig:clusterPlot} Scatterplots of the normalized log
+    A versus log B intensities for one SNP. The panel labels indicate
+    whether the plotting symbols are colored by genotype (left), the
+    CRLMM genotype confidence score (middle), or chemistry plate
+    (right).  The CRLMM confidence scores were all high, ranging from
+    0.89 (dark grey) to 1 (white).  The HapMap phase 3 samples were
+    processed over a time interval of approximately 1 year.  The two
+    highlighted in the right panel had scan dates that were processed
+    approximately 8 months apart.  }
+\end{figure}
+
+\paragraph{Alternatives.}  Alternatives to the the \proglang{R} package
+\pkg{crlmm} for genotyping Affymetrix arrays include \pkg{BRLMM}
+\citep{Rabbee2006, Affymetrix2006}, \pkg{Birdseed} \citep{Korn2008,
+  McCarroll2008}, \pkg{SNPiPer-HD} \citep{Hua2007}, \pkg{CHIAMO}
+\citep{Wtccc2007}, and the Affymetrix Genotyping Console (\pkg{GTC})
+software. (\pkg{GTC} uses Birdseed to genotype Affymetrix 6.0 arrays
+and BRLMM to genotype Affymetrix 5.0 arrays.)  An alternative to
+quantile-normalization for preprocessing Affymetrix arrays is
+implemented in the \proglang{R} package \pkg{aroma.affymetrix}
+\citep{Bengtsson2008}.
+
+\subsection{Marker-level copy number estimation}
+\label{sec:cn}
+% In this section, we discuss the implementation of the algorithm in
+% \pkg{crlmm}, provide examples of methods for the
+% \Robject{CNSet} container introduced in Section
+% \ref{implementation}, and suggest visualizations for exploratory
+% data analysis.
+
+Following preprocessing and genotyping by the \Rfunction{genotype}
+function, we call the \proglang{R} function \crlmmCopynumber{} to estimate the
+parameters for copy number estimation outlined in Section
+\ref{methods}. The \crlmmCopynumber{} function requires an object of
+class \code{CNSet} and returns the value \verb+TRUE+ upon successful
+completion.  Additional arguments to the \crlmmCopynumber{} are
+available and are documented in the \pkg{crlmm} package.  As with the
+\genotype{} function, we set the \verb+cache=TRUE+ flag in the
+delimiter for the following code chunk.
+
+<<copynumber, cache=TRUE, eval=FALSE>>=
+invisible(open(cnSet))
+cnSet.updated <- crlmmCopynumber(cnSet)
+@
+\noindent Note that the \Rfunction{crlmmCopynumber} returns
+\verb+TRUE+ upon successful completion and does not return an object
+of class \CNSet{}.  Rather, updates to elements of the
+\verb+batchStatistics+ slot in the \Robject{cnSet} object are written
+to disk using the \pkg{ff} interface and are not returned by the
+function.
+
+Batch-specific summary statistics are computed as part of the copy
+number estimation step.  Accessors defined in the \pkg{crlmm} package
+return these summary statistics as arrays.  The following code chunk
+illustrates a few of the available accessors for batch-specific
+summary statistics, including the genotype frequencies
+(\Rfunction{Ns}), the median absolute deviation (across samples) of
+the normalized intensities (\Rfunction{mads}), and the median
+intensity (\Rfunction{medians}).  The argument $j$ is used to indicate
+the batch.  In the example below, we extract the above summary
+statistics for the 3rd and 4th batch.
+
+<<batchSummaryStatistics,cache=TRUE>>=
+table(batch(cnSet))
+Ns(cnSet, i=1:3, j=3:4)
+mads(cnSet, i=1:3, j=3:4)[, "A", , ]
+medians(cnSet, i=1:3, j=3:4)[, "A", , ]
+@
+
+The regression coefficients from model \eqref{eq:snplevel2} for copy
+number are also stored in the \verb@batch-@ \verb@Statistics@ slot.  A
+useful means to inspect model fit is to plot the normalized
+intensities and overlay the fitted regression line.  In the following
+code chunk, we instantiate a new \Robject{CNSet} object containing 16
+randomly selected SNPs and all of the samples on the GIGAS chemistry
+plate.
+
+<<extractAB>>=
+invisible(open(cnSet))
+invisible(open(cnSet$gender))
+set.seed(123)
+snp.index <- sample(which(isSnp(cnSet) == 1), 16, replace=FALSE)
+sample.index <- which(batch(cnSet) == "GIGAS")
+exampleData1 <- cnSet[snp.index, sample.index]
+invisible(close(cnSet))
+invisible(close(cnSet$gender))
+@
+
+<<dataObject-exampleData1, echo=FALSE>>=
+save(exampleData1, file="../../data/exampleData1.rda")
+@
+
+\noindent The \texttt{exampleData1} object is provided in the
+\pkg{crlmmCompendium} package and can be loaded as follows.
+<<loadObject-exampleData1>>=
+if(!exists("exampleData1")) data(exampleData1)
+@
+
+Next we extract the normalized intensities for the \A{} and \B{}
+alleles, the genotype calls, and the estimated coefficients for the
+intercept (nuA) and slope (phA) for the \A{} allele.  Figure
+\ref{fig:boxplotA} illustrates the fit of the linear model to the \A{}
+allele intensities for the SNPs in the \Robject{exampleData1} object.
+
+<<dataCnFigs>>=
+a <- t(as.matrix(A(exampleData1)))
+gt <- t(as.matrix(calls(exampleData1)))
+nuA <- as.numeric(nu(exampleData1, "A"))
+phA <- as.numeric(phi(exampleData1, "A"))
+col <- brewer.pal(7, "Accent")[c(1, 4, 7)]
+NN <- Ns(exampleData1, i=1:16, j=1)[, , 1]
+fns <- featureNames(exampleData1)
+snpId <- matrix(fns, nrow(a), ncol(a), byrow=TRUE)
+snpId <- factor(snpId, levels=fns, ordered=TRUE)  ##IMPORTANT
+ldat <- data.frame(A=as.integer(a),
+		   gt=as.factor(c("AA", "AB", "BB")[as.integer(gt)]),
+		   snp=snpId)
+boxplotfig <- bwplot(A~gt|snp, ldat, cex=0.6, panel=lmPanel, nu=nuA,
+		     ph=phA, fill="lightblue", Ns=NN,
+		     par.strip.text=list(lines=0.9, cex=0.6),
+		     ylab=expression(I[A]),
+		     xlab=expression(I[B]), ltext.y=2500, label.cex=0.6)
+@
+
+<<boxplotA, fig=TRUE, include=FALSE, echo=FALSE>>=
+pars <- trellis.par.get()
+pars$axis.text$cex <- 0.7
+pars$xlab.text$cex <- 0.8
+pars$ylab.text$cex <- 0.8
+trellis.par.set("axis.text", pars$axis.text)
+trellis.par.set("xlab.text", pars$xlab.text)
+trellis.par.set("ylab.text", pars$ylab.text)
+print(boxplotfig)
+@
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=\textwidth]{Figures/manuscript-boxplotA}
+  \caption{\label{fig:boxplotA} Each panel displays the intensities
+    for the \A{} allele for all samples on the GIGAS plate stratified
+    by the genotype call. The linear model is fitted on the intensity
+    scale (as opposed to the log-scale) with parameters for the
+    intercept and slope that are SNP- and batch-specific.  The
+    straight line over-plotted is the estimated background and slope
+    for the GIGAS plate.  The numbers in each panel indicate the
+    genotype frequencies.}
+% \ec
+\end{figure}
+
+Scatterplots of the log-transformed normalized intensities for the
+\A{} and \B{} alleles can be useful for visualizing the bivariate
+normal prediction regions for integer copy number (see equation
+\eqref{eq:bvn}).  Using the same set of randomly selected SNPs in the
+previous code chunk, we plot the prediction regions for copy numbers
+0, 1, 2, 3, and 4.  To set up this graphic, we use two functions
+provided with the \pkg{crlmmCompendium} package:
+\Rfunction{prePredictPanel} and \Rfunction{makeTransparent}.  The
+\Rfunction{prePredictPanel} and \Rfunction{makeTransparent} functions
+are used to organize the genomic data into a \Rclass{data.frame}
+object and to allow a partially transparent rendering of the
+prediction regions, respectively.  Finally, we set up a legend for the
+figure using the \pkg{lattice} function \Rfunction{simpleKey} and create
+an object of class \Rclass{trellis} with the function
+\Rfunction{xyplot}.  The resulting trellis object is displayed in
+Figure \ref{fig:scatterAB}
+
+<<defineLatticeObjects>>=
+ldat <- prePredictPanel(exampleData1)
+shades <- makeTransparent(brewer.pal(6, "BrBG"), alpha=0.6)[c(1,2,3,5,6)]
+##replace the middle color (white) with something else
+mykey <- simpleKey(as.character(0:4), points=FALSE, rectangles=TRUE, col="black", space="right", cex=0.7)
+mykey$rectangles[["col"]] <- shades
+(bvnfig <- xyplot(A~B|snp, ldat, cex=0.3, panel=cnPredictionPanel, object=exampleData1,
+	       x.axis="B", copynumber=0:4, line.col=shades, line.lwd=1.5,
+	       shades=shades, ylab=expression(log[2](I[A])), xlab=expression(log[2](I[B])),
+	       par.strip.text=list(lines=0.9, cex=0.6),
+		xlim=c(6,12.5), ylim=c(6,12.5),
+	       key=mykey))
+@
+
+
+<<ABscatterplots, fig=TRUE, include=FALSE, echo=FALSE>>=
+pars <- trellis.par.get()
+pars$axis.text$cex <- 0.5
+pars$xlab.text$cex <- 0.7
+pars$ylab.text$cex <- 0.7
+trellis.par.set("axis.text", pars$axis.text)
+trellis.par.set("xlab.text", pars$xlab.text)
+trellis.par.set("ylab.text", pars$ylab.text)
+print(bvnfig)
+@
+
+\begin{figure}[t!]
+ \centering
+ \includegraphics[width=\textwidth]{Figures/manuscript-ABscatterplots}
+ \caption{\label{fig:scatterAB} A scatter plot of the $\log2$
+   normalized intensities for 16 randomly selected SNPs.  The
+   bivariate normal prediction regions derived from the linear model
+   are plotted for copy numbers 0 - 4. }
+\end{figure}
+
+In most applications, the raw copy number estimates are intermediate
+values and passed directly to segmentation algorithms or hidden Markov
+models.  Rather than estimate the raw copy number for all markers and
+samples and deal with I/O of data storage and access, our preference
+is to summarizes these estimates by the genomic intervals obtained by
+by a segmentation or hidden Markov model.  In the following code, we
+create a \CNSet{} object containing only the markers on chromosome 8
+and the samples in batch SHELF.  (For reasons discussed in the
+following section, we are particularly interested in the NA19007
+sample.)
+
+<<shelfSet, cache=TRUE>>=
+marker.index <- which(chromosome(cnSet) == 8)
+sample.index <- match("NA19007", sampleNames(cnSet))
+batch.index <- which(batch(cnSet) == batch(cnSet)[sample.index])
+invisible(open(cnSet))
+shelfSet <- cnSet[marker.index, batch.index]
+shelfSet <- shelfSet[order(position(shelfSet)), ]
+invisible(close(cnSet))
+dup.index <- which(duplicated(position(shelfSet)))
+if(length(dup.index) > 0) shelfSet <- shelfSet[-dup.index, ]
+@
+
+\noindent Using the relationship defined in equation \eqref{eq:cnK},
+we obtain estimates of the total copy number for the
+\Robject{shelfSet} object using the \Rfunction{rawCopynumber}
+function.  Specifically, this function computes $\hat{c}_\A +
+\hat{c}_\B$.  The \Rfunction{robustSds} function provided in the
+\pkg{VanillaICE} package can be used to provide estimates of uncertainty.
+<<tcn,cache=TRUE>>=
+tcn <- rawCopynumber(shelfSet, i=seq(length=nrow(shelfSet)), j=seq(length=ncol(shelfSet)))
+sds <- robustSds(tcn)
+@
+
+\paragraph{Alternatives.}  An alternative to absolute allele-specific
+copy number estimation in \pkg{crlmm} is the \proglang{R} package
+\pkg{aroma.affymetrix} that provides estimates of copy number
+relative to a reference set \citep{Bengtsson2008}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   DOWNSTREAM
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section[Downstream]{Downstream tools}% for analyzing marker-level estimates
+\subsection[Downstream]{Downstream tools for inferring regions of copy number
+  gain and loss}
+\label{sec:downstream}
+Marker-level estimates of copy number for Affymetrix and Illumina
+platforms are too noisy to reliably quantitate copy number at a single
+marker. Approaches that smooth the copy number estimates as a function
+of the physical position are useful for inferring regions of copy
+alterations and copy-neutral regions of homozygosity (ROH). This
+section illustrates how the marker-level estimates of copy number from
+\pkg{crlmm} can be passed to downstream segmentation and HMM algorithms.
+We illustrate our approach on chromosome 8 of HapMap sample NA19007
+for which a large amplification on the p-arm has been previously
+identified \citep{Redon2006}.
+
+For fitting a HMM or segmenting estimates of copy number, it is
+convenient to put estimates of copy number into a container for
+genotypes and copy number.  The container \Robject{oligoSnpSet}
+defined in the \pkg{oligoClasses} package serves this purpose and can be
+instantiated directly from a \CNSet{} object. The \Robject{redonSet}
+object created in the following code chunk is provided with the
+compendium.
+
+<<oligoSnpSet>>=
+sample.index <- match("NA19007", sampleNames(shelfSet))
+j <- match("NA19007", sampleNames(shelfSet))
+redonSet <- new("oligoSnpSet",
+		copyNumber=integerMatrix(tcn[, j, drop=FALSE], 100),
+		cnConfidence=integerMatrix(1/sds[, j, drop=FALSE], 100),
+		call=as.matrix(calls(shelfSet)[, j, drop=FALSE]),
+		callProbability=as.matrix(snpCallProbability(shelfSet)[, j, drop=FALSE]),
+		phenoData=phenoData(shelfSet)[j, ],
+		featureData=featureData(shelfSet))
+@
+
+Centering the copy number estimates by the median for the chromosome
+ensures that the baseline state is centered at 2. Note that for cancer
+samples, centering by the median copy number calculated across all
+autosomes would enable one to identify deletions or duplications that
+effect most of a chromosome.
+
+<<center>>=
+copyNumber(redonSet) <- copyNumber(redonSet) - median(copyNumber(redonSet), na.rm=TRUE) + 200L
+@
+
+
+<<dataObject-redonSet, echo=FALSE>>=
+save(redonSet, file="../../data/redonSet.rda")
+@
+
+<<loadObject-redonSet, echo=FALSE>>=
+if(!exists("redonSet")) data(redonSet)
+@
+
+\paragraph{A hidden Markov model.}
+The HMM implemented in the \proglang{R} package \pkg{VanillaICE} allows
+some flexibility for the data inputs and the definition of the hidden
+states.  For example, the vignette included in the \pkg{VanillaICE}
+package documents how one can fit a HMM to copy number-only data (e.g,
+if genotypes were not available as in array comparative genomic
+hybridization), copy number and genotype data (SNP chips), and
+genotype-only data. Of course, the hidden states depend on the data
+type. For copy number and genotype data, one could have copy number
+alterations as well as copy-neutral regions of homozygosity as hidden
+states.  For genotype-only data, the hidden states are region of
+homozygosity and normal.  In the following code, we specify homozygous
+deletion, hemizygous deletion, normal, and amplification as the hidden
+states of interest. For each of the hidden states, the user must
+indicate the corresponding initial state probability (log-scale) and
+the probability of a homozygous genotype.  The object returned by the
+\Rfunction{hmm.setup} function contains various parameters used for
+fitting the HMM as well as the estimated emission probabilities.
+
+<<HMM>>=
+cnStates <- c(0, 1, 2, 2, 3, 4)
+@
+
+%<<HMM>>=
+%hmmOpts <- hmm.setup(redonSet,  c("hom-del", "hem-del", "normal", "amp"),
+%		     copynumberStates=c(0:3), normalIndex=3,
+%		     log.initialP=rep(log(1/4), 4),
+%		     prGenotypeHomozygous=c(0.8, 0.99, 0.7, 0.75))
+%@
+
+Next, we apply the Viterbi algorithm to estimate the optimal sequence
+of states \citep{Viterbi1967}.  The transition probabilities used in
+the HMM are a function of the distance between markers and can be
+scaled by the \verb+TAUP+ object to control the smoothness of the
+state path. In particular, larger values of \verb+TAUP+ make it more
+difficult to transition between states and provide a smoother state
+path.  Future versions of the \pkg{VanillaICE} package may estimate
+\verb+TAUP+.
+
+<<viterbi>>=
+fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE)
+hmm.df <- as.data.frame(fit.cn)
+print(hmm.df[, c(2:4,7, 10,11)])
+@
+
+The evidence for the deletions and alternations is summarized by the
+log likelihood ratio (LLR) comparing the predicted amplification or
+deletion to the null model of no copy number alteration.  The LLR can
+be a useful statistic for ranking copy number alterations.
+<<hmm.llr>>=
+hmm.df[hmm.df$state ==5, "LLR"]
+@
+
+\paragraph{Circular binary segmentation.}  For somatic cell diseases
+such as cancer, DNA is collected from tissue that may contain a
+mixture of cell populations.  For example, cells that represent
+different stages of cancer evolution. At any given locus, it is
+possible that a fraction of the cells have different integer copy
+numbers. As a result, the aggregate copy number measured by an array
+is not necessarily an integer and the concept of a genotype in a
+mixture of cell types is ambiguous.  Unlike hidden Markov models that
+often assume an integer copy number state, segmentation algorithms
+identify genomic segments with constant copy number. Note that there
+is no implicit assumption that the copy number at any given locus is
+an integer. As a result, segmentation algorithms such as circular
+binary segmentation \citep{Olshen2004, Venkat2007} are well-suited for
+the analysis of genomic data from cancers.
+
+In this section, we fit the circular binary segmentation (CBS)
+algorithm to the copy number estimates from HapMap sample NA19007. The
+CBS algorithm is implemented in the \proglang{R} package \pkg{DNAcopy}. Following
+the vignette accompanying the \pkg{DNAcopy} package, we create an object
+of class \Rclass{CNA} and use the \Rfunction{smooth.CNA} to smooth
+single point outliers.
+
+<<dnacopy>>=
+CNA.object <- CNA(genomdat=copyNumber(redonSet)/100,
+		  chrom=chromosome(redonSet),
+		  maploc=position(redonSet),
+		  data.type="logratio",
+		  sampleid=sampleNames(redonSet))
+smu.object <- smooth.CNA(CNA.object)
+@
+\noindent Next, we apply the CBS algorithm to the smoothed data using
+the function \Rfunction{segment} in the package \pkg{DNAcopy}.  As the
+segmentation can be slow, we use the \verb+cache=TRUE+ in the
+declaration of the following code chunk.
+
+<<cbs_segment, cache=TRUE>>=
+cbs.segments <- segment(smu.object)
+print(cbs.segments, showSegRows=TRUE)
+@
+
+The output from the \Rfunction{segment} function is a collection of
+genomic intervals annotated by the mean copy number and the number of
+markers in the segment.  While the above example contains genomic
+ranges from the segmentation of a single subject's chromosome 8, a
+typical analysis may contain multiple subjects and chromosomes.  The
+\pkg{IRanges} package available from Bioconductor provides an extensive
+infrastructure for manipulating and organizing genomic ranges, as well
+as efficient functions for common queries such as
+\Rfunction{findOverlaps} that operate on objects of the class.  We
+therefore illustrate how one can extract the segmentation results and
+create an object of class \Rclass{RangedData} defined in the
+\pkg{IRanges} package that may be useful in downstream applications. The
+functions \Rfunction{RangedData} and \Rfunction{IRanges} in the
+following code instantiate instances of the corresponding class.
+Additional details on these classes and functions are provided in the
+help files and vignettes accompanying the \pkg{IRanges} package available
+from Bioconductor.
+
+<<coerce2Iranges>>=
+cbs.out <- cbs.segments$output
+cbs.segs1 <- RangedData(IRanges(cbs.out$loc.start, cbs.out$loc.end),
+			numMarkers=cbs.out$num.mark,
+			seg.mean=cbs.out$seg.mean,
+			chrom=8L)
+@
+
+
+The helper function \Rfunction{addCentromereBreaks} included in the
+\pkg{crlmmCompendium} is used to add breaks for the centromere.  The copy
+number estimates and genotype calls are then collected into a simple
+\Rclass{data.frame} that will be passed to the \pkg{lattice} function
+\Rfunction{xyplot} for visualizing the data.
+
+<<oligo.data.frame>>=
+cbs.segs1 <- addCentromereBreaks(cbs.segs1)
+cn <- as.numeric(copyNumber(redonSet))
+gt <- as.integer(as.matrix(calls(redonSet)))
+df <- data.frame(cn=cn, gt=gt, position=position(redonSet)/1e6)
+@
+
+\noindent Finally, we select colors for distinguishing homozygous from
+heterozygous genotypes, and a second set of colors to indicate the
+hidden states inferred from the hidden Markov model.
+
+<<redonFigSetup>>=
+genotype.cols <- c("lightblue", "green3", "lightblue")
+states <- unique(as.integer(factor(fit.cn$state, levels=c(1, 3, 4, 5))))
+shades <- brewer.pal(10, "PRGn")
+shades <- shades[c(2,4,1,8)]
+shades[3] <- "white"
+shades <- makeTransparent(shades, alpha=0.6)
+mykey <- simpleKey(c("hom-del", "hem-del", "normal", "duplicated")[states[order(states)]], points=FALSE,
+		   rectangles=TRUE, col="black", space="top", cex=0.7)
+mykey$rectangles[["col"]] <- shades[states[order(states)]]
+@
+
+\noindent The panel function \Rfunction{cnPanel} provided with the
+\pkg{crlmmCompendium} is used to plot the the copy number and genotype
+calls.  Copy number alterations inferred from the hidden Markov model
+are indicated at the bottom of Figure \ref{fig:redon}.  The segment
+means from the CBS are indicated by the black segments overlaying the
+copy number estimates.  Approaches for calling deletions and
+amplifications from the segment means have been described elsewhere
+\citep{Willenbrock2005}.
+
+<<Fig5>>=
+stdev <- mad(df$cn, na.rm=TRUE)/100
+redonfig <- xyplot(cn/100~position, df, pch=".", panel=cnPanel,
+		   ylim=c(-0.5,6), ylab="total copy number",
+		   pch.cols=genotype.cols,
+		   gt=df$gt,
+		   hmm.segs=fit.cn,
+		   cbs.segs=cbs.segs1,
+		   scales=list(x=list(tick.number=12)),
+		   lwd=1,
+		   shades=shades, key=mykey, xlim=c(0,150), draw.key=TRUE,
+		   xlab="physical position (Mb)",
+		   add.ideogram=TRUE,
+		   par.strip.text=list(lines=0.9, cex=0.6))
+print(redonfig)
+trellis.focus("panel", 1, 1)
+ltext(median(df$position), 0, "HMM states", cex=0.9)
+@
+
+<<redonFigure, fig=TRUE, width=8, height=6,include=FALSE, echo=FALSE>>=
+pars <- trellis.par.get()
+pars$axis.text$cex <- 0.6
+pars$xlab.text$cex <- 0.8
+pars$ylab.text$cex <- 0.8
+trellis.par.set("axis.text", pars$axis.text)
+trellis.par.set("xlab.text", pars$xlab.text)
+trellis.par.set("ylab.text", pars$ylab.text)
+print(redonfig)
+trellis.focus("panel", 1, 1)
+ltext(median(df$position), 0, "HMM states", cex=0.9)
+@
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=\textwidth]{Figures/manuscript-redonFigure}
+  \caption{\label{fig:redon} An amplification on the p-arm of
+    chromosome 8 for HapMap sample NA19007.  Estimates of raw copy
+    number and the results of the HMM fit to the raw copy number.  The
+    segment means from circular binary segmentation overlay the copy
+    number estimates. The colors of the plotting symbols indicate
+    whether the CRLMM genotype is AA/BB (light blue) or AB
+    (green). Nonpolymorphic markers are plotted in grey.}
+\end{figure}
+
+
+\paragraph{Alternatives.} Alternative packages for smoothing copy
+number estimates include the HMMs in the packages \pkg{Birdseye}
+\citep{Korn2008} and \pkg{PennCNV} \citep{Wang2007a}, and the
+breakpoint detection algorithms implemented in the packages \pkg{GLAD}
+\citep{Hupe2004}, \pkg{segclust} \citep{Picard2005,Picard2007}, and
+\pkg{GADA} \citep{Pique-Regi2008}.
+
+
+\section{Discussion}
+\label{sec:disc}
+We have applied the \pkg{crlmm} software to the HapMap phase 3 data,
+illustrating the steps of preprocessing, the genotyping of polymorphic
+markers, and the estimation of allele-specific copy number.  We
+organize the normalized intensities, statistical summaries from the
+genotyping and copy number estimation steps, and meta-data on the
+features and samples in a single container.  This organization
+facilitates visualizations that allow inspection of the genotypes and
+copy number estimates in the context of the lower-level data. In
+addition, several of the algorithms have been adapted to allow
+parallelization and the underlying data structures currently implement
+utilities in the \pkg{ff} package to minimize \pkg{crlmm}'s memory
+footprint.  We have provided several useful visualizations related to
+low-level copy number analysis using the HapMap data as an exemplar.
+Note that it would be straightforward to proceed in the opposite
+direction -- to target genomic regions in which copy number estimates
+are associated with a particular phenotype, followed by more detailed
+inspection of the loci in the region.
+
+Batch effects are common in large studies due to the extended period
+of time required to process the samples.  The \pkg{crlmm} package
+models the variation driven by batch as part of the estimation
+procedure for copy number, permitting inference of copy number gain
+and loss from batch-adjusted locus-level summaries.  We expect that
+such an approach will reduce the occurrence of spurious associations
+induced by temporal artifacts such as batch effects. Users should
+carefully inspect that the resulting inferences from the copy number
+analysis are not driven by technological artifacts.  Future versions
+of \pkg{crlmm} may provide an interface with software specifically
+designed for batch detection, such as surrogate variable analysis
+implemented in the \pkg{sva} package \citep{Leek2007}.  Approaches for
+detecting and adjusting for batch effects have been described in a
+recent review \citep{Leek2010}.
+
+While smoothing the locus-level estimates of copy number to infer
+regions of gain and loss is beyond the scope of the \pkg{crlmm}
+package, the ability to easily integrate with packages that provide
+these utilities is essential. Our analysis of the HapMap data
+illustrates a general workflow that begins with the raw fluorescence
+intensities from the array scanners and concludes with inferences of
+amplified regions and deletions from a hidden Markov model. The
+flexibility to tailor complex genomic analyses to specific use-cases,
+such as copy number inference in family-based studies, is a strength
+of the modular framework illustrated here.
+
+
+
+\section{Session information}
+\label{sec:session}
+The \proglang{R} package \pkg{crlmm} is available from Bioconductor
+\url{http://www.bioconductor.org}.
+
+This document was prepared using Sweave.  Computationally intensive
+steps, such as the genotype calling and copy number estimation were
+cached using the \pkg{cacheSweave} package \citep{Peng2009}.
+<<results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@
+
+<<eval=FALSE, echo=FALSE>>=
+crlmmCompendium:::run()##makes the pdf
+@
+
+\section*{Acknowledgements}
+RBS was supported by grant R00HG005015 from the NIH/NHGRI and Johns
+Hopkins Medical Institutions' CTSA grant.  IR was supported by NIH
+grant R01GM083084.  RI was supported by NIH grant R01RR021967. We
+would like to think Marvin Newhouse for computing support.
+
+\bibliography{jss664}
+
+\section*{Work in progress}
+
+\subsection*{B allele frequencies and parallelization}
+
+One can compute B allele frequencies and log R ratios for each of the
+samples and use these as inputs to the HMM.  The B allele frequencies
+can be particularly helpful for amplifications. In the following
+unevaluated code chunk we create a \Rclass{oligoSnpSetList} object
+where each element in the list is an \Rclass{oligoSnpSet} for one
+chromosome. As only two chromosomes are specified in the following
+code chunk, the list has length two.
+
+<<baf, eval=FALSE>>=
+oligoSetList <- cnSet2oligoSetList(cnSet, batch.name="SHELF", chrom=c(8,9))
+save(oligoSetList, file="../../data/oligoSetList.rda")
+@
+
+<<loadOligoSetList, echo=FALSE>>=
+stop()
+load("../../data/oligoSetList.rda")
+@
+
+<<oligoSetListAccessors>>=
+print(oligoSetList)
+chromosome(oligoSetList)
+ls(assayData(oligoSetList))
+@
+
+A HMM incorporating the B allele frequencies and log R ratios can be
+fit using the \Rfunction{hmm} method.  When used with a package
+supporting parallel processing, such as the \R{} package
+\Rpackage{snow}, the HMM will automatically be parallelized over
+elements (chromosomes) in the \Robject{oligoSnpSetList} object.
+
+<<hmmForOligoSetList>>=
+fit2 <- hmm(oligoSetList, sampleIds="NA19007")
+@
+
+\subsection*{Visualization of RangedData and low-level summaries with
+  lattice}
+
+<<latticefig>>=
+fitAltered <- fit2[state(fit2) %in% c(1,2,5,6) & chromosome(fit2)==8,]
+oligoSet <- oligoSetList[[1]]
+fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
+		    frame=1e6, panel=SNPchip:::xypanelBaf,
+		    ylim=c(-4, 1.5),
+		    cex=0.2,
+		    pch=21,
+		    col.het="salmon",
+		    fill.het="salmon",
+		    col.hom="royalblue",
+		    fill.hom="royalblue",
+		    state.cex=0.5,
+		    border="orange", scales=list(x="free"),
+		    par.strip.text=list(cex=0.5),
+		    xlab="Mb", ylab=expression(log[2]("R ratio")))
+@
+
+<<savelatticefig,echo=FALSE>>=
+pdf("Figures/latticefigLrrBaf.pdf", width=8,height=6)
+print(fig)
+dev.off()
+@
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Figures/latticefigLrrBaf.pdf}
+  \caption{\label{fig:snr} Plot of log R ratios and BAFs for
+    alterations on chromosome 8. }
+\end{figure}
+
+
+\end{document}
+
+

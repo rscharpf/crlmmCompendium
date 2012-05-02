@@ -1,0 +1,19 @@
+Package: crlmmCompendium
+Title:  This package contains the compendium for copy number estimation with the crlmm package
+Version: 1.1.0
+Date: Sun Feb 13 03:43:11 2010
+Author: RB Scharpf, RA Irizarry, B Carvalho, MA Ritchie, I Ruczinski
+Description:   Scripts and R code used to generate the jss manuscript
+Maintainer: Rob Scharpf <rscharpf@jshph.edu>
+License: Artistic-2.0
+Depends: R (>= 2.13.0),
+	 RColorBrewer,
+	 DNAcopy (>= 1.26.0),
+	 ellipse,
+	 lattice,
+	 crlmm (>= 1.10.0),
+	 IRanges,
+	 SNPchip (>= 1.16.0),
+	 VanillaICE (>= 1.14.0),
+	 tools
+Imports: oligoClasses, crlmm

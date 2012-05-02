@@ -1,0 +1,9 @@
+export(getHapMapIds, addCentromereBreaks, makeTransparent, mySweave)
+
+## panel functions for lattice
+export(cnPredictionPanel, lmPanel, cnPanel, prePredictPanel)
+exportMethods(show)
+
+##export(mySweave)
+
+
