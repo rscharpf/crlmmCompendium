@@ -31,7 +31,9 @@ cnStates <- c(0, 1, 2, 2, 3, 4)
 ###################################################
 ### code chunk number 49: viterbi
 ###################################################
-fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE)
+fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE, p.hom=0)
+##alteredStateIndex <- c(1,2,5,6)
+##fit.cn <- fit.cn[state(fit.cn) %in% alteredStateIndex, ]
 hmm.df <- as.data.frame(fit.cn)
 print(hmm.df[, c(2:4,7, 10,11)])
 
@@ -77,14 +79,15 @@ df <- data.frame(cn=cn, gt=gt, position=position(redonSet)/1e6)
 ### code chunk number 55: redonFigSetup
 ###################################################
 genotype.cols <- c("lightblue", "green3", "lightblue")
-states <- unique(as.integer(factor(fit.cn$state, levels=c(1, 3, 4, 5))))
+fit.cn <- fit.cn[state(fit.cn) != 4, ]
+states <- as.integer(factor(state(fit.cn),levels=c(1,2,3,5)))
 shades <- brewer.pal(10, "PRGn")
-shades <- shades[c(2,4,1,8)]
+shades <- shades[c(2,4,1,8)] ## pick 4 shades
 shades[3] <- "white"
 shades <- makeTransparent(shades, alpha=0.6)
-mykey <- simpleKey(c("hom-del", "hem-del", "normal", "duplicated")[states[order(states)]], points=FALSE,
+mykey <- simpleKey(c("hom-del", "hem-del", "normal", "duplicated")[unique(states[order(states)])], points=FALSE,
 		   rectangles=TRUE, col="black", space="top", cex=0.7)
-mykey$rectangles[["col"]] <- shades[states[order(states)]]
+mykey$rectangles[["col"]] <- shades[unique(states[order(states)])]
 
 
 ###################################################
