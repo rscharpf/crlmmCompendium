@@ -1,6 +1,6 @@
 Package: crlmmCompendium
 Title:  This package contains the compendium for copy number estimation with the crlmm package
-Version: 1.1.3
+Version: 1.1.4
 Date: Sun Feb 13 03:43:11 2010
 Author: RB Scharpf, RA Irizarry, B Carvalho, MA Ritchie, I Ruczinski
 Description:   Scripts and R code used to generate the jss manuscript
