@@ -63,15 +63,15 @@ cnPredictionPanel <- function(x, y, ...,
 	phB <- as.numeric(phi(object, "B"))[i]
 	nuA <- as.numeric(nu(object, "A"))[i]
 	phA <- as.numeric(phi(object, "A"))[i]
-	taus <- tau2(object, i=i)[, , , 1]
-	cors <- corr(object, i=i)[, , 1]
-	t2A <- taus["A", "BB"]
-	t2B <- taus["B", "AA"]
-	s2A <- taus["A", "AA"]
-	s2B <- taus["B", "BB"]
-	corrAB <- cors["AB"]
-	corrAA <- cors["AA"]
-	corrBB <- cors["BB"]
+	taus <- tau2(object)[, , , 1]
+	cors <- corr(object)[, , 1]
+	t2A <- taus[i, "A", "BB"]
+	t2B <- taus[i, "B", "AA"]
+	s2A <- taus[i, "A", "AA"]
+	s2B <- taus[i, "B", "BB"]
+	corrAB <- cors[i, "AB"]
+	corrAA <- cors[i,"AA"]
+	corrBB <- cors[i,"BB"]
 	k <- 1
 	for(CN in copynumber){
 		for(CA in 0:CN){
@@ -181,12 +181,14 @@ cnPanel <- function(x, y, ..., pch.cols, gt, cbs.segs, hmm.segs, shades, subscri
 		  y1=cbs.segs$seg.mean, ...)
 	if(draw.hmm.states){
 		hmm.segs <- hmm.segs[order(width(hmm.segs), decreasing=TRUE), ]
+		stateindex <- as.integer(factor(state(hmm.segs),levels=c(1,2,3,5)))
+		##stateindex <- as.integer(factor(fit.cn$state, levels=c(1, 5)))
 		lrect(xleft=start(hmm.segs)/1e6,
 		      xright=end(hmm.segs)/1e6,
 		      ybottom=-0.4,
 		      ytop=0,
-		      border=shades[hmm.segs$state],
-		      col=shades[hmm.segs$state])
+		      border=shades[stateindex],
+		      col=shades[stateindex])
 	}
 	ltext(130, 5, paste("MAD:", round(mad(y, na.rm=TRUE), 2)))
 	if(add.ideogram){

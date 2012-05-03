@@ -1313,7 +1313,7 @@ code chunk, we instantiate a new \Robject{CNSet} object containing 16
 randomly selected SNPs and all of the samples on the GIGAS chemistry
 plate.
 
-<<extractAB>>=
+<<extractAB,cache=TRUE>>=
 invisible(open(cnSet))
 invisible(open(cnSet$gender))
 set.seed(123)
@@ -1504,7 +1504,7 @@ instantiated directly from a \CNSet{} object. The \Robject{redonSet}
 object created in the following code chunk is provided with the
 compendium.
 
-<<oligoSnpSet>>=
+<<oligoSnpSet,cache=TRUE>>=
 sample.index <- match("NA19007", sampleNames(shelfSet))
 j <- match("NA19007", sampleNames(shelfSet))
 redonSet <- new("oligoSnpSet",
@@ -1574,8 +1574,10 @@ difficult to transition between states and provide a smoother state
 path.  Future versions of the \pkg{VanillaICE} package may estimate
 \verb+TAUP+.
 
-<<viterbi>>=
-fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE)
+<<viterbi,cache=TRUE>>=
+fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE, p.hom=0)
+##alteredStateIndex <- c(1,2,5,6)
+##fit.cn <- fit.cn[state(fit.cn) %in% alteredStateIndex, ]
 hmm.df <- as.data.frame(fit.cn)
 print(hmm.df[, c(2:4,7, 10,11)])
 @
@@ -1585,7 +1587,7 @@ log likelihood ratio (LLR) comparing the predicted amplification or
 deletion to the null model of no copy number alteration.  The LLR can
 be a useful statistic for ranking copy number alterations.
 <<hmm.llr>>=
-hmm.df[hmm.df$state ==5, "LLR"]
+hmm.df[which(hmm.df$state ==5)[1], "LLR"]
 @
 
 \paragraph{Circular binary segmentation.}  For somatic cell diseases
@@ -1674,14 +1676,15 @@ hidden states inferred from the hidden Markov model.
 
 <<redonFigSetup>>=
 genotype.cols <- c("lightblue", "green3", "lightblue")
-states <- unique(as.integer(factor(fit.cn$state, levels=c(1, 3, 4, 5))))
+fit.cn <- fit.cn[state(fit.cn) != 4, ]
+states <- as.integer(factor(state(fit.cn),levels=c(1,2,3,5)))
 shades <- brewer.pal(10, "PRGn")
-shades <- shades[c(2,4,1,8)]
+shades <- shades[c(2,4,1,8)] ## pick 4 shades
 shades[3] <- "white"
 shades <- makeTransparent(shades, alpha=0.6)
-mykey <- simpleKey(c("hom-del", "hem-del", "normal", "duplicated")[states[order(states)]], points=FALSE,
+mykey <- simpleKey(c("hom-del", "hem-del", "normal", "duplicated")[unique(states[order(states)])], points=FALSE,
 		   rectangles=TRUE, col="black", space="top", cex=0.7)
-mykey$rectangles[["col"]] <- shades[states[order(states)]]
+mykey$rectangles[["col"]] <- shades[unique(states[order(states)])]
 @
 
 \noindent The panel function \Rfunction{cnPanel} provided with the
@@ -1818,6 +1821,8 @@ would like to think Marvin Newhouse for computing support.
 
 \bibliography{jss664}
 
+\clearpage
+
 \section*{Work in progress}
 
 \subsection*{B allele frequencies and parallelization}
@@ -1876,7 +1881,7 @@ fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
 		    xlab="Mb", ylab=expression(log[2]("R ratio")))
 @
 
-<<savelatticefig,echo=FALSE>>=
+<<savelatticefig,echo=FALSE,results=hide>>=
 pdf("Figures/latticefigLrrBaf.pdf", width=8,height=6)
 print(fig)
 dev.off()
