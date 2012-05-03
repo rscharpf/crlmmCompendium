@@ -1836,7 +1836,7 @@ chromosome. As only two chromosomes are specified in the following
 code chunk, the list has length two.
 
 <<baf, eval=FALSE>>=
-oligoSetList <- cnSet2oligoSetList(cnSet, batch.name="SHELF", chrom=c(8,9))
+oligoSetList <- constructOligoSetListFrom(cnSet, batch.name="SHELF", chrom=c(8,9))
 save(oligoSetList, file="../../data/oligoSetList.rda")
 @
 
