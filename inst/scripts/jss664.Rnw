@@ -238,8 +238,7 @@
 \begin{document}
 
 <<options, echo=FALSE>>=
-options(prompt="R> ", continue=" ", device=pdf, width=68)
-outdir <- "/nexsan2/disk3/rscharpf/crlmmCompendium"
+options(prompt="R> ", continue=" ", device=pdf, width=60)
 if(!file.exists(outdir)) dir.create(outdir, recursive=TRUE)
 @
 
@@ -922,7 +921,7 @@ ocSamples(200)
 \noindent Finally, the \pkg{cacheSweave} package is loaded for caching
 output from long code chunks and a directory for storing the cached
 computations is declared.
-<<enableCaching>>=
+<<enableCaching,eval=FALSE>>=
 library("cacheSweave")
 setCacheDir(outdir)
 @
@@ -1576,8 +1575,6 @@ path.  Future versions of the \pkg{VanillaICE} package may estimate
 
 <<viterbi,cache=TRUE>>=
 fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE, p.hom=0)
-##alteredStateIndex <- c(1,2,5,6)
-##fit.cn <- fit.cn[state(fit.cn) %in% alteredStateIndex, ]
 hmm.df <- as.data.frame(fit.cn)
 print(hmm.df[, c(2:4,7, 10,11)])
 @
@@ -1823,76 +1820,76 @@ would like to think Marvin Newhouse for computing support.
 
 \clearpage
 
-\section*{Work in progress}
-
-\subsection*{B allele frequencies and parallelization}
-
-One can compute B allele frequencies and log R ratios for each of the
-samples and use these as inputs to the HMM.  The B allele frequencies
-can be particularly helpful for amplifications. In the following
-unevaluated code chunk we create a \Rclass{oligoSnpSetList} object
-where each element in the list is an \Rclass{oligoSnpSet} for one
-chromosome. As only two chromosomes are specified in the following
-code chunk, the list has length two.
-
-<<baf, eval=FALSE>>=
-oligoSetList <- constructOligoSetListFrom(cnSet, batch.name="SHELF", chrom=c(8,9))
-save(oligoSetList, file="../../data/oligoSetList.rda")
-@
-
-<<loadOligoSetList, echo=FALSE>>=
-load("../../data/oligoSetList.rda")
-@
-
-<<oligoSetListAccessors>>=
-print(oligoSetList)
-chromosome(oligoSetList)
-ls(assayData(oligoSetList))
-@
-
-A HMM incorporating the B allele frequencies and log R ratios can be
-fit using the \Rfunction{hmm} method.  When used with a package
-supporting parallel processing, such as the \R{} package
-\Rpackage{snow}, the HMM will automatically be parallelized over
-elements (chromosomes) in the \Robject{oligoSnpSetList} object.
-
-<<hmmForOligoSetList,cache=TRUE>>=
-fit2 <- hmm(oligoSetList, sampleIds="NA19007")
-@
-
-\subsection*{Visualization of RangedData and low-level summaries with
-  lattice}
-
-<<latticefig>>=
-fitAltered <- fit2[state(fit2) %in% c(1,2,5,6) & chromosome(fit2)==8,]
-oligoSet <- oligoSetList[[1]]
-fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
-		    frame=1e6, panel=SNPchip:::xypanelBaf,
-		    ylim=c(-4, 1.5),
-		    cex=0.2,
-		    pch=21,
-		    col.het="red",
-		    fill.het="red",
-		    col.hom="grey",
-		    fill.hom="grey",
-		    state.cex=0.8,
-		    border="orange", scales=list(x="free"),
-		    par.strip.text=list(cex=0.5),
-		    xlab="Mb", ylab=expression(log[2]("R ratio")))
-@
-
-<<savelatticefig,echo=FALSE,results=hide>>=
-pdf("Figures/latticefigLrrBaf.pdf", width=8,height=6)
-print(fig)
-dev.off()
-@
-
-\begin{figure}[t!]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Figures/latticefigLrrBaf.pdf}
-  \caption{\label{fig:snr} Plot of log R ratios and BAFs for
-    alterations on chromosome 8. }
-\end{figure}
+%\section*{Work in progress}
+%
+%\subsection*{B allele frequencies and parallelization}
+%
+%One can compute B allele frequencies and log R ratios for each of the
+%samples and use these as inputs to the HMM.  The B allele frequencies
+%can be particularly helpful for amplifications. In the following
+%unevaluated code chunk we create a \Rclass{oligoSnpSetList} object
+%where each element in the list is an \Rclass{oligoSnpSet} for one
+%chromosome. As only two chromosomes are specified in the following
+%code chunk, the list has length two.
+%
+%<<baf, eval=FALSE>>=
+%oligoSetList <- constructOligoSetListFrom(cnSet, batch.name="SHELF", chrom=c(8,9))
+%save(oligoSetList, file="../../data/oligoSetList.rda")
+%@
+%
+%<<loadOligoSetList, echo=FALSE>>=
+%load("../../data/oligoSetList.rda")
+%@
+%
+%<<oligoSetListAccessors>>=
+%print(oligoSetList)
+%chromosome(oligoSetList)
+%ls(assayData(oligoSetList))
+%@
+%
+%A HMM incorporating the B allele frequencies and log R ratios can be
+%fit using the \Rfunction{hmm} method.  When used with a package
+%supporting parallel processing, such as the \R{} package
+%\Rpackage{snow}, the HMM will automatically be parallelized over
+%elements (chromosomes) in the \Robject{oligoSnpSetList} object.
+%
+%<<hmmForOligoSetList,cache=TRUE>>=
+%fit2 <- hmm(oligoSetList, sampleIds="NA19007")
+%@
+%
+%\subsection*{Visualization of RangedData and low-level summaries with
+%  lattice}
+%
+%<<latticefig>>=
+%fitAltered <- fit2[state(fit2) %in% c(1,2,5,6) & chromosome(fit2)==8,]
+%oligoSet <- oligoSetList[[1]]
+%fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
+%		    frame=1e6, panel=SNPchip:::xypanelBaf,
+%		    ylim=c(-4, 1.5),
+%		    cex=0.2,
+%		    pch=21,
+%		    col.het="red",
+%		    fill.het="red",
+%		    col.hom="grey",
+%		    fill.hom="grey",
+%		    state.cex=0.8,
+%		    border="orange", scales=list(x="free"),
+%		    par.strip.text=list(cex=0.5),
+%		    xlab="Mb", ylab=expression(log[2]("R ratio")))
+%@
+%
+%<<savelatticefig,echo=FALSE,results=hide>>=
+%pdf("Figures/latticefigLrrBaf.pdf", width=8,height=6)
+%print(fig)
+%dev.off()
+%@
+%
+%\begin{figure}[t!]
+%  \centering
+%  \includegraphics[width=0.9\textwidth]{Figures/latticefigLrrBaf.pdf}
+%  \caption{\label{fig:snr} Plot of log R ratios and BAFs for
+%    alterations on chromosome 8. }
+%\end{figure}
 
 
 \end{document}

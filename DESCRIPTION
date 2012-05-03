@@ -11,9 +11,9 @@ Depends: R (>= 2.14.0),
 	 DNAcopy (>= 1.26.0),
 	 ellipse,
 	 lattice,
-	 crlmm (>= 1.15.2),
+	 crlmm (>= 1.14.0),
 	 IRanges,
-	 SNPchip (>= 2.3.2),
-	 VanillaICE (>= 1.19.8),
+	 SNPchip (>= 2.2.0),
+	 VanillaICE (>= 1.18.0),
 	 tools
 Imports: oligoClasses, crlmm
