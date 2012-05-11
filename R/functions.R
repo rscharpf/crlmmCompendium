@@ -115,12 +115,14 @@ insertCentromereBreak <- function(range.object, insertWhere=c("centromereStart",
 	j <- which(colnames(chromosomeAnnotation) == insertWhere)
 	if(insertWhere=="centromereStart"){
 		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 1] & end(range.object) >= chromosomeAnnotation[chrom, 1])
-		stopifnot(length(index) == 1)
+		if(length(index) == 0) return(range.object)
+		##stopifnot(length(index) == 1)
 		end(range.object)[index] <- chromosomeAnnotation[chrom, 1]
 	}
 	if(insertWhere=="centromereEnd"){
 		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 2] & end(range.object) >= chromosomeAnnotation[chrom, 2])
-		stopifnot(length(index) == 1)
+		if(length(index) == 0) return(range.object)
+		##stopifnot(length(index) == 1)
 		start(range.object)[index] <- chromosomeAnnotation[chrom, 2]
 	}
 	range.object[index, ]
@@ -143,7 +145,7 @@ addCentromereBreaks <- function(ranges.object){
 	index <- which(start(ranges.object) == start(centromere.ranges)[1])
 	ranges.object <- ranges.object[-index, ]
 	rd <- my.rbind(ranges.object, centromere.ranges)
-	rd[order(start(rd)), ]
+	rd[sort(start(rd)), ]
 }
 
 lmPanel <- function(..., line.col="grey30", label.cex=0.8, Ns, allele="A", nu, ph, subscripts, ltext.y=2500){
