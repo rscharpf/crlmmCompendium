@@ -107,26 +107,26 @@ cnPredictionPanel <- function(x, y, ...,
 	}
 }
 
-insertCentromereBreak <- function(range.object, insertWhere=c("centromereStart", "centromereEnd")){
-	data(chromosomeAnnotation)
-	stopifnot(insertWhere %in% c("centromereStart", "centromereEnd"))
-	chrom <- unique(range.object$chrom)
-	stopifnot(all(is.integer(chrom)))
-	j <- which(colnames(chromosomeAnnotation) == insertWhere)
-	if(insertWhere=="centromereStart"){
-		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 1] & end(range.object) >= chromosomeAnnotation[chrom, 1])
-		if(length(index) == 0) return(range.object)
-		##stopifnot(length(index) == 1)
-		end(range.object)[index] <- chromosomeAnnotation[chrom, 1]
-	}
-	if(insertWhere=="centromereEnd"){
-		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 2] & end(range.object) >= chromosomeAnnotation[chrom, 2])
-		if(length(index) == 0) return(range.object)
-		##stopifnot(length(index) == 1)
-		start(range.object)[index] <- chromosomeAnnotation[chrom, 2]
-	}
-	range.object[index, ]
-}
+##insertCentromereBreak <- function(range.object, insertWhere=c("centromereStart", "centromereEnd")){
+##	data(chromosomeAnnotation)
+##	stopifnot(insertWhere %in% c("centromereStart", "centromereEnd"))
+##	chrom <- unique(range.object$chrom)
+##	stopifnot(all(is.integer(chrom)))
+##	j <- which(colnames(chromosomeAnnotation) == insertWhere)
+##	if(insertWhere=="centromereStart"){
+##		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 1] & end(range.object) >= chromosomeAnnotation[chrom, 1])
+##		if(length(index) == 0) return(range.object)
+##		##stopifnot(length(index) == 1)
+##		end(range.object)[index] <- chromosomeAnnotation[chrom, 1]
+##	}
+##	if(insertWhere=="centromereEnd"){
+##		index <- which(start(range.object) <= chromosomeAnnotation[chrom, 2] & end(range.object) >= chromosomeAnnotation[chrom, 2])
+##		if(length(index) == 0) return(range.object)
+##		##stopifnot(length(index) == 1)
+##		start(range.object)[index] <- chromosomeAnnotation[chrom, 2]
+##	}
+##	range.object[index, ]
+##}
 
 my.rbind <- function(range1, range2){
 	RangedData(IRanges(c(start(range1), start(range2)),
@@ -139,13 +139,32 @@ my.rbind <- function(range1, range2){
 
 
 addCentromereBreaks <- function(ranges.object){
-	range1 <- insertCentromereBreak(ranges.object, insertWhere="centromereStart")
-	range2 <- insertCentromereBreak(ranges.object, insertWhere="centromereEnd")
-	centromere.ranges <- my.rbind(range1, range2)
-	index <- which(start(ranges.object) == start(centromere.ranges)[1])
-	ranges.object <- ranges.object[-index, ]
-	rd <- my.rbind(ranges.object, centromere.ranges)
-	rd[sort(start(rd)), ]
+##	range1 <- insertCentromereBreak(ranges.object, insertWhere="centromereStart")
+##	range2 <- insertCentromereBreak(ranges.object, insertWhere="centromereEnd")
+##	centromere.ranges <- my.rbind(range1, range2)
+##	index <- which(start(ranges.object) == start(centromere.ranges)[1])
+##	ranges.object <- ranges.object[-index, ]
+##	rd <- my.rbind(ranges.object, centromere.ranges)
+##	rd[sort(start(rd)), ]
+	path.gap <- system.file("extdata", package="SNPchip")
+	gaps <- readRDS(list.files(path.gap, pattern=paste("gap_", metadata(ranges.object)$genome, ".rda", sep=""), full.names=TRUE))
+	tmp <- findOverlaps(gaps[, ], ranges.object)
+	j <- subjectHits(tmp)
+	i <- queryHits(tmp)
+	gr <- gaps[i, ]
+	gr <- ranges.object[j, ]
+	start(gr) <- start(gaps)[i]
+	end(gr) <- end(gaps)[i]
+	cbs.segs2 <- c(ranges.object, gr)
+	disjoin.gr <- disjoin(cbs.segs2)
+	olaps <- findOverlaps(disjoin.gr, cbs.segs2)
+	i <- queryHits(olaps); j <- subjectHits(olaps)
+	elementMetadata(disjoin.gr)$seg.mean <- NA
+	elementMetadata(disjoin.gr)$numberProbes <- NA
+	elementMetadata(disjoin.gr)$seg.mean[i] <- values(cbs.segs2)$seg.mean[j]
+	elementMetadata(disjoin.gr)$numberProbes[i] <- values(cbs.segs2)$numberProbes[j]
+	## number of probes should be reestimated for the ranges that were broken by the centromere
+	return(disjoin.gr)
 }
 
 lmPanel <- function(..., line.col="grey30", label.cex=0.8, Ns, allele="A", nu, ph, subscripts, ltext.y=2500){
@@ -179,8 +198,8 @@ cnPanel <- function(x, y, ..., pch.cols, gt, cbs.segs, hmm.segs, shades, subscri
 	lpoints(x[which.hom], y[which.hom], col=pch.cols[1], ...)
 	lpoints(x[which.het], y[which.het], col=pch.cols[2], ...)
 	lsegments(x0=start(cbs.segs)/1e6, x1=end(cbs.segs)/1e6,
-		  y0=cbs.segs$seg.mean,
-		  y1=cbs.segs$seg.mean, ...)
+		  y0=values(cbs.segs)$seg.mean,
+		  y1=values(cbs.segs)$seg.mean, ...)
 	if(draw.hmm.states){
 		hmm.segs <- hmm.segs[order(width(hmm.segs), decreasing=TRUE), ]
 		stateindex <- as.integer(factor(state(hmm.segs),levels=c(1,2,3,5)))
@@ -194,18 +213,12 @@ cnPanel <- function(x, y, ..., pch.cols, gt, cbs.segs, hmm.segs, shades, subscri
 	}
 	ltext(130, 5, paste("MAD:", round(mad(y, na.rm=TRUE), 2)))
 	if(add.ideogram){
-		pathto <- system.file("hg18", package="SNPchip")
-		cytoband <- read.table(file.path(pathto, "cytoBand.txt"), as.is=TRUE)
-		cytoband$V2 <- cytoband$V2/1e6
-		cytoband$V3 <- cytoband$V3/1e6
-		colnames(cytoband) <- c("chrom", "start", "end", "name", "gieStain")
-		plotIdiogram(unique(hmm.segs$chrom),
-			     cytoband=cytoband,
+		plotIdiogram(chromosome(hmm.segs)[1],
+			     build=metadata(cbs.segs)$genome,
 			     cytoband.ycoords=c(5.6, 5.9),
 			     new=FALSE,
-			     label.cytoband=FALSE,
-			     build="hg18",
-			     is.lattice=TRUE)
+			     labels.cytoband=FALSE,
+			     is.lattice=TRUE, unit="Mb")
 	}
 }
 

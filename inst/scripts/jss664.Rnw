@@ -239,7 +239,8 @@
 
 <<options, echo=FALSE>>=
 options(prompt="R> ", continue=" ", device=pdf, width=68)
-outdir <- "/nexsan2/disk3/rscharpf/crlmmCompendium"
+if(!exists("outdir"))
+	outdir <- "/nexsan2/disk3/rscharpf/crlmmCompendium"
 if(!file.exists(outdir)) dir.create(outdir, recursive=TRUE)
 @
 
@@ -957,12 +958,17 @@ confidence scores at SNPs. As the preprocessing and genotyping is
 computationally intensive, we set \verb+cache=TRUE+ in the declaration
 of the following code chunk.
 
-<<genotypeLD,eval=FALSE>>=
-cnSet <- genotype(filenames=filenames, cdfName="genomewidesnp6", batch=plate)
+
+
+<<genotypeLD>>=
+if(!file.exists(file.path(outdir, "cnSet.rda"))){
+	cnSet <- genotype(filenames=filenames, cdfName="genomewidesnp6", batch=plate)
+	save(cnSet, file=file.path(outdir, "cnSet.rda"))
+}
 @
 
 <<loadCnSet, echo=FALSE>>=
-load("../../data/cnSet.rda")
+load(file.path(outdir, "cnSet.rda"))
 @
 \noindent The object returned by the \Rfunction{genotype} function,
 assigned to the name \Robject{cnSet} in the above command, is an
@@ -1276,7 +1282,7 @@ available and are documented in the \pkg{crlmm} package.  As with the
 \genotype{} function, we set the \verb+cache=TRUE+ flag in the
 delimiter for the following code chunk.
 
-<<copynumber, cache=TRUE, eval=FALSE>>=
+<<copynumber, cache=TRUE>>=
 invisible(open(cnSet))
 cnSet.updated <- crlmmCopynumber(cnSet)
 @
@@ -1513,7 +1519,8 @@ redonSet <- new("oligoSnpSet",
 		call=as.matrix(calls(shelfSet)[, j, drop=FALSE]),
 		callProbability=as.matrix(snpCallProbability(shelfSet)[, j, drop=FALSE]),
 		phenoData=phenoData(shelfSet)[j, ],
-		featureData=featureData(shelfSet))
+		featureData=featureData(shelfSet),
+		genome=genomeBuild(cnSet))
 @
 
 Centering the copy number estimates by the median for the chromosome
@@ -1576,10 +1583,8 @@ path.  Future versions of the \pkg{VanillaICE} package may estimate
 
 <<viterbi,cache=TRUE>>=
 fit.cn <- hmm(redonSet, TAUP=1e10, cnStates=cnStates, is.log=FALSE, p.hom=0)
-##alteredStateIndex <- c(1,2,5,6)
-##fit.cn <- fit.cn[state(fit.cn) %in% alteredStateIndex, ]
 hmm.df <- as.data.frame(fit.cn)
-print(hmm.df[, c(2:4,7, 10,11)])
+hmm.df
 @
 
 The evidence for the deletions and alternations is summarized by the
@@ -1650,10 +1655,11 @@ from Bioconductor.
 
 <<coerce2Iranges>>=
 cbs.out <- cbs.segments$output
-cbs.segs1 <- RangedData(IRanges(cbs.out$loc.start, cbs.out$loc.end),
-			numMarkers=cbs.out$num.mark,
-			seg.mean=cbs.out$seg.mean,
-			chrom=8L)
+cbs.segs1 <- GRanges(rep("chr8", nrow(cbs.out)),
+		     IRanges(cbs.out$loc.start, cbs.out$loc.end),
+		     numberProbes=cbs.out$num.mark,
+		     seg.mean=cbs.out$seg.mean, seqlengths=getSequenceLengths(genomeBuild(cnSet))["chr8"])
+metadata(cbs.segs1) <- list(genome=genomeBuild(cnSet))
 @
 
 
@@ -1675,6 +1681,7 @@ heterozygous genotypes, and a second set of colors to indicate the
 hidden states inferred from the hidden Markov model.
 
 <<redonFigSetup>>=
+fit.cn <- fit.cn[["NA19007"]]
 genotype.cols <- c("lightblue", "green3", "lightblue")
 fit.cn <- fit.cn[state(fit.cn) != 4, ]
 states <- as.integer(factor(state(fit.cn),levels=c(1,2,3,5)))
@@ -1825,49 +1832,69 @@ would like to think Marvin Newhouse for computing support.
 
 \section*{Work in progress}
 
-\subsection*{B allele frequencies and parallelization}
+\subsection*{B allele frequencies,  parallelization, and smoothing for
+  large data (many samples/multiple batches)}
 
-One can compute B allele frequencies and log R ratios for each of the
-samples and use these as inputs to the HMM.  The B allele frequencies
-can be particularly helpful for amplifications. In the following
-unevaluated code chunk we create a \Rclass{oligoSnpSetList} object
-where each element in the list is an \Rclass{oligoSnpSet} for one
-chromosome. As only two chromosomes are specified in the following
-code chunk, the list has length two.
+One can compute B allele frequencies and log R ratios (LRRs) for each
+of the samples and use these as inputs to the HMM.  The B allele
+frequencies (BAFs) can be particularly helpful for amplifications. In
+the following unevaluated code chunk we create a
+\Rclass{BafLrrSetList} object where each element in the list is an
+\Rclass{BafLrrSet} for one chromosome. The BAFs and LRRs are
+calculated for each batch using the batch-specific genotype cluster
+centers.  As the following codechunk takes a while to compute as BAFs
+and LRRs are calculated for all chromosomes and all samples, we save
+the output of the function to \texttt{outdir} and load from disk.
 
-<<baf, eval=FALSE>>=
-oligoSetList <- constructOligoSetListFrom(cnSet, batch.name="SHELF", chrom=c(8,9))
-save(oligoSetList, file="../../data/oligoSetList.rda")
+
+<<baf>>=
+if(!file.exists(file.path(outdir, "brList.rda"))){
+	brList <- constructBafLrrSetListFrom(cnSet)
+	save(brList, file=file.path(outdir, "brList.rda"))
+} else load(file.path(outdir, "brList.rda"))
 @
 
-<<loadOligoSetList, echo=FALSE>>=
-load("../../data/oligoSetList.rda")
-@
+%<<oligoSetListAccessors>>=
+%print(oligoSetList)
+%chromosome(oligoSetList)
+%ls(assayData(oligoSetList))
+%@
 
-<<oligoSetListAccessors>>=
-print(oligoSetList)
-chromosome(oligoSetList)
-ls(assayData(oligoSetList))
-@
-
-A HMM incorporating the B allele frequencies and log R ratios can be
+An HMM incorporating the B allele frequencies and log R ratios can be
 fit using the \Rfunction{hmm} method.  When used with a package
 supporting parallel processing, such as the \R{} package
-\Rpackage{snow}, the HMM will automatically be parallelized over
-elements (chromosomes) in the \Robject{oligoSnpSetList} object.
+\Rpackage{snow}, the HMM will run over elements (chromosomes) in the
+\Robject{oligoSnpSetList} object in parallel.  The HMM will be fit to
+all samples in the \Robject{brList} object if the \texttt{sampleIds}
+argument is not specified.
 
-<<hmmForOligoSetList,cache=TRUE>>=
-fit2 <- hmm(oligoSetList, sampleIds="NA19007")
+<<hmmForOligoSetList,cache=TRUE,eval=FALSE>>=
+fit2 <- hmm(brList, sampleIds="NA19007")
+fit2 <- fit2[["NA19007"]]
+@
+
+Alternatively, if multiple nodes are available one can enable
+parallelization.
+
+<<registerBackend>>=
+library(snow)
+library(doSNOW)
+cl <- makeCluster(22, type="SOCK")
+registerDoSNOW(cl)
+@
+
+<<hmmForOligoSetListParallel,cache=TRUE>>=
+fit2 <- hmm(brList, sampleIds="NA19007")
+fit2 <- fit2[["NA19007"]]
 @
 
 \subsection*{Visualization of RangedData and low-level summaries with
   lattice}
 
 <<latticefig>>=
-fitAltered <- fit2[state(fit2) %in% c(1,2,5,6) & chromosome(fit2)==8,]
-oligoSet <- oligoSetList[[1]]
-fig <- xyplotLrrBaf(rd=fitAltered, object=oligoSet,
-		    frame=1e6, panel=SNPchip:::xypanelBaf,
+fitAltered <- fit2[state(fit2) %in% c(1,2,5,6) & chromosome(fit2)=="chr8",]
+fig <- xyplotLrrBaf(rd=fitAltered, object=brList[[8]][, "NA19007"],
+		    frame=200e3, panel=xypanelBaf,
 		    ylim=c(-4, 1.5),
 		    cex=0.2,
 		    pch=21,
