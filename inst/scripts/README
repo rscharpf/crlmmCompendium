@@ -1,0 +1,33 @@
+To update everything
+
+#From cluster,
+cd inst/scripts
+Sweave("jss664.Rnw")
+tools::texi2dvi("jss664.tex",pdf=TRUE)
+
+##From shell on cluster,
+make codechunks
+
+# From laptop, copy figures
+./pull #again
+cd ../doc/org
+make
+make sync
+
+# Again on shell from enigma
+cd ~/Software/crlmmCompendium/inst/scripts
+make clean
+cd ~/Software
+R CMD build crlmmCompendium
+
+scp enigma2.jhsph.edu:~/Papers/2010/crlmmCompendium_*.tar.gz .
+
+
+# From emacs
+# change buffer to *scratch*
+C-x C-e # at beginning and end of scratch
+M-x org-publish-project <return> crlmmCompendium
+# From bash shell
+cd ~/Public/public_html
+./sync  #syncs website
+
